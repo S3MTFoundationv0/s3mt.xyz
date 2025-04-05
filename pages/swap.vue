@@ -1,5 +1,22 @@
 <template>
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+  <div 
+    v-motion
+    :initial="{ opacity: 0, x: 50 }" 
+    :enter="{
+      opacity: 1,
+      x: 0, 
+      transition: {
+        duration: 450,
+        ease: 'easeOut',
+      },
+    }"
+    :leave="{ 
+      opacity: 0, 
+      x: -50, // Slide out left
+      transition: { duration: 200, ease: 'easeIn' } 
+    }"
+    class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12"
+  >
     <div class="max-w-2xl mx-auto">
       <div class="card">
         <h2 class="text-2xl font-bold mb-6">Swap Tokens</h2>
