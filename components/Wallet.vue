@@ -17,22 +17,18 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
 import { WalletProvider } from '@solana/wallet-adapter-vue';
 import { WalletModalProvider } from '@solana/wallet-adapter-vue-ui';
-// Import adapters dynamically or ensure they are tree-shaken if not used on server
-// For simplicity, we'll initialize them in onMounted
+// Import adapters directly for synchronous initialization on client
+import { PhantomWalletAdapter, SolflareWalletAdapter } from '@solana/wallet-adapter-wallets';
 
-const wallets = ref([]);
+// Initialize wallets synchronously
+const wallets = ref([
+  new PhantomWalletAdapter(),
+  new SolflareWalletAdapter(),
+  // Add other adapters here if needed
+]);
 
-onMounted(async () => {
-  // Import adapters only on the client
-  const { PhantomWalletAdapter, SolflareWalletAdapter } = await import('@solana/wallet-adapter-wallets');
-  wallets.value = [
-    new PhantomWalletAdapter(),
-    new SolflareWalletAdapter(),
-    // Add other adapters here if needed
-  ];
-});
-
+// Removed onMounted hook
 </script> 
