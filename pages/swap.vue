@@ -35,8 +35,8 @@
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-300">To</label>
-            <div class="bg-gray-700 border border-gray-600 rounded-md px-3 py-2">
-              S3MT
+            <div class="bg-gray-700 border border-gray-600 rounded-md px-3 py-2 flex items-center">
+              <Logo size="xs" /> 
             </div>
             <input
               type="number"
