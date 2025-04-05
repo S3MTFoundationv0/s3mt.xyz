@@ -3,7 +3,9 @@
     class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12"
   >
     <img src="/logo.svg" alt="S3MT Logo" class="h-40 w-auto mx-auto mb-6">
-    <h1 class="text-4xl font-bold mb-10 text-center">S3MT Whitepaper</h1>
+    <h1 class="text-4xl font-bold mb-10 text-center flex justify-center items-center gap-3">
+      <Logo size="lg" /> Whitepaper
+    </h1>
     
     <div class="flex flex-col lg:flex-row gap-8">
       <!-- Main Content -->
