@@ -2,7 +2,7 @@
   <Wallet>
     <div class="min-h-screen bg-gray-900 text-white flex flex-col">
       <NavBar />
-      <main class="overflow-x-hidden flex-grow">
+      <main class="flex-grow">
         <NuxtPage 
           :transition="{
             name: 'page',
