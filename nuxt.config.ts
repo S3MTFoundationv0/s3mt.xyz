@@ -46,11 +46,11 @@ export default defineNuxtConfig({
     optimizeDeps: {
       include: [
         'eventemitter3',
-        '@solana/web3.js',
         'bs58',
+        'events',
+        '@solana/web3.js',
         '@coral-xyz/anchor',
-        'buffer',
-        '@solana/wallet-adapter-base',
+        'buffer'
       ],
       esbuildOptions: {
         target: 'esnext',
