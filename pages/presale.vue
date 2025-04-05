@@ -70,9 +70,10 @@
   </div>
 </template>
 
-<script setup>
+<script setup >
 import { ref, computed } from 'vue'
-import { WalletMultiButton, useWallet } from '@solana/wallet-adapter-vue'
+import { useWallet } from '@solana/wallet-adapter-vue'
+import { WalletMultiButton } from '@solana/wallet-adapter-vue-ui'
 
 const wallet = useWallet()
 const solAmount = ref(0.1) // Default or minimum amount
