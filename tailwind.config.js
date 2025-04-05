@@ -1,6 +1,11 @@
+const defaultTheme = require('tailwindcss/defaultTheme')
+
 module.exports = {
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['"Exo 2"', ...defaultTheme.fontFamily.sans],
+      },
       colors: {
         primary: {
           DEFAULT: '#8B5CF6', // Purple
