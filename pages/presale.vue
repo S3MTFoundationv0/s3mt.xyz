@@ -12,7 +12,9 @@
     }"
     class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12"
   >
-    <h1 class="text-3xl font-bold text-center mb-8">S3MT Presale</h1>
+    <h1 class="text-3xl font-bold text-center mb-8 flex justify-center items-center gap-2">
+      <Logo size="md" /> <span>Presale</span>
+    </h1>
     
     <div class="bg-gray-800 shadow-lg rounded-lg p-6 md:p-8">
       <div class="grid md:grid-cols-2 gap-8 items-center">
@@ -39,7 +41,9 @@
         
         <!-- Right Side: Purchase Form -->
         <div>
-          <h3 class="text-xl font-semibold mb-4">Buy S3MT Tokens</h3>
+          <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
+            <span>Buy</span> <Logo size="sm" /> <span>Tokens</span>
+          </h3>
           <form @submit.prevent="handlePurchase">
             <div class="mb-4">
               <label for="solAmount" class="block text-sm font-medium text-gray-300 mb-1">Amount (SOL)</label>
