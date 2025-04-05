@@ -1,5 +1,20 @@
 <template>
-  <section class="relative h-screen overflow-hidden">
+  <section 
+    v-motion
+    :initial="{ opacity: 0 }"
+    :enter="{
+      opacity: 1,
+      transition: {
+        duration: 500,
+        ease: 'easeInOut',
+      },
+    }"
+    :leave="{ 
+      opacity: 0,
+      transition: { duration: 200, ease: 'easeIn' } 
+    }" 
+    class="relative h-screen overflow-hidden"
+  >
     <!-- Background image or SVG -->
     <div class="absolute inset-0 z-0">
       <img src="/assets/images/synthwave-bg.png" alt="Synthwave mining scene"
