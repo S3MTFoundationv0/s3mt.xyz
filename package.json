@@ -10,13 +10,14 @@
     "postinstall": "nuxi prepare"
   },
   "dependencies": {
-    "@nuxtjs/tailwindcss": "^6.11.4",
-    "@solana/web3.js": "1.91.1",
-    "@solana/wallet-adapter-vue": "0.4.5",
-    "@solana/wallet-adapter-wallets": "0.19.33",
-    "@vueuse/motion": "3.0.3",
     "@headlessui/vue": "^1.7.19",
     "@heroicons/vue": "^2.1.1",
+    "@nuxtjs/tailwindcss": "^6.11.4",
+    "@solana/wallet-adapter-vue": "0.4.5",
+    "@solana/wallet-adapter-vue-ui": "^0.2.4",
+    "@solana/wallet-adapter-wallets": "0.19.33",
+    "@solana/web3.js": "1.91.1",
+    "@vueuse/motion": "3.0.3",
     "nuxt": "^3.10.3",
     "vue": "^3.4.21"
   },
