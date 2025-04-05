@@ -1,0 +1,28 @@
+{
+  "name": "s3mt-presale",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxi build",
+    "dev": "nuxi dev --host",
+    "generate": "nuxi generate",
+    "preview": "nuxi preview",
+    "postinstall": "nuxi prepare"
+  },
+  "dependencies": {
+    "@nuxtjs/tailwindcss": "^6.11.4",
+    "@solana/web3.js": "1.91.1",
+    "@solana/wallet-adapter-vue": "0.4.5",
+    "@solana/wallet-adapter-wallets": "0.19.33",
+    "@vueuse/motion": "3.0.3",
+    "@headlessui/vue": "^1.7.19",
+    "@heroicons/vue": "^2.1.1",
+    "nuxt": "^3.10.3",
+    "vue": "^3.4.21"
+  },
+  "devDependencies": {
+    "@nuxt/devtools": "^1.0.8",
+    "@types/node": "^20.11.25",
+    "typescript": "^5.4.2"
+  }
+}
