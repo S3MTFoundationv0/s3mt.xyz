@@ -32,9 +32,7 @@ export default defineNuxtConfig({
     transpile: [
       '@solana/wallet-adapter-base',
       '@solana/wallet-adapter-wallets',
-      'solana-wallets-vue',
-      '@solana/web3.js',
-      '@solana/kit',
+      'solana-wallets-vue'
     ]
   },
 
@@ -49,6 +47,7 @@ export default defineNuxtConfig({
       include: [
         'eventemitter3',
         '@solana/web3.js',
+        'bs58',
         '@coral-xyz/anchor',
         'buffer',
         '@solana/wallet-adapter-base',
