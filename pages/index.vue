@@ -31,9 +31,9 @@
       <p class="text-lg md:text-xl max-w-2xl mb-8 text-white/80">
         Smart. Secure. Sustainable. Join the movement where crypto meets clean energy.
       </p>
-      <div class="flex gap-4 flex-wrap justify-center">
-        <NuxtLink to="/presale" class="btn btn-primary">Buy Now</NuxtLink>
-        <NuxtLink to="/whitepaper" class="btn btn-secondary">Learn More</NuxtLink>
+      <div class="flex justify-center gap-6 mt-8">
+        <NuxtLink to="/presale" class="btn btn-primary btn-lg btn-glow-primary">Buy Now</NuxtLink>
+        <NuxtLink to="/whitepaper" class="btn btn-secondary btn-lg">Learn More</NuxtLink>
       </div>
     </div>
   </section>

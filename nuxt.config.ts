@@ -14,7 +14,7 @@ export default defineNuxtConfig({
 
   css: [
     '~/assets/css/main.css',
-    './node_modules/@solana/wallet-adapter-vue-ui/styles.css'
+    // Wallet styles are imported in the plugin
   ],
 
   runtimeConfig: {
@@ -31,16 +31,39 @@ export default defineNuxtConfig({
   build: {
     transpile: [
       '@solana/wallet-adapter-base',
-      '@solana/wallet-adapter-vue',
-      '@solana/wallet-adapter-vue-ui'
+      '@solana/wallet-adapter-wallets',
+      'solana-wallets-vue'
     ]
   },
 
   vite: {
+    esbuild: {
+      target: "esnext",
+    },
+    build: {
+      target: "esnext",
+    },
     optimizeDeps: {
       include: [
-        'eventemitter3' 
-      ]
+        'eventemitter3',
+        'bs58',
+        'events',
+        '@solana/web3.js',
+        '@coral-xyz/anchor',
+        'buffer'
+      ],
+      esbuildOptions: {
+        target: 'esnext',
+      }
+    },
+    resolve: {
+      alias: {
+        buffer: 'buffer/',
+      }
+    },
+    // Ensure browser environment
+    define: {
+      'process.env.BROWSER': true,
     }
   },
 
