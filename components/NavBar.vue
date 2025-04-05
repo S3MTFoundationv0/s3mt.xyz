@@ -4,7 +4,7 @@
       <div class="flex items-center justify-between h-16">
         <div class="flex items-center">
           <div class="flex-shrink-0">
-            <img class="h-8 w-auto" src="/logo.svg" alt="S3MT Logo" />
+            <img class="h-12 w-auto" src="/logo.svg" alt="S3MT Logo" />
           </div>
           <div class="hidden md:block">
             <div class="ml-10 flex items-baseline space-x-4">
