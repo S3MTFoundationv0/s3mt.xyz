@@ -12,12 +12,28 @@ export default defineNuxtConfig({
     }
   },
 
-  css: ['~/assets/css/main.css'],
+  css: [
+    '~/assets/css/main.css',
+    './node_modules/@solana/wallet-adapter-vue-ui/styles.css'
+  ],
 
   runtimeConfig: {
     public: {
-      solanaNetwork: process.env.SOLANA_NETWORK || 'devnet'
+      solanaNetwork: process.env.SOLANA_NETWORK || 'devnet',
+      motion: {
+        directives: {
+          // your motion directives if any
+        }
+      }
     }
+  },
+
+  build: {
+    transpile: [
+      '@solana/wallet-adapter-base',
+      '@solana/wallet-adapter-vue',
+      '@solana/wallet-adapter-vue-ui'
+    ]
   },
 
   compatibilityDate: '2025-04-02',
