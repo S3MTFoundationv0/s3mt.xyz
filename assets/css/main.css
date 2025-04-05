@@ -12,6 +12,10 @@ body {
   @apply px-4 py-2 rounded-lg font-semibold transition-colors;
 }
 
+.btn-lg {
+  @apply px-8 py-3 text-lg;
+}
+
 .btn-primary {
   @apply bg-primary hover:bg-primary-dark;
 }
@@ -22,4 +26,19 @@ body {
 
 .card {
   @apply bg-gray-800 rounded-xl p-6 shadow-lg;
+}
+
+/* Pulsating Glow Animation */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 5px theme('colors.primary.DEFAULT'), 0 0 10px theme('colors.primary.DEFAULT');
+  }
+  50% {
+    box-shadow: 0 0 15px theme('colors.primary.DEFAULT'), 0 0 30px theme('colors.primary.DEFAULT');
+  }
+}
+
+.btn-glow-primary {
+  @apply shadow-lg;
+  animation: pulse-glow 2.5s infinite ease-in-out;
 }
