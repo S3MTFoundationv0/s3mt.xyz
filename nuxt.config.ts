@@ -36,5 +36,13 @@ export default defineNuxtConfig({
     ]
   },
 
+  vite: {
+    optimizeDeps: {
+      include: [
+        'eventemitter3' 
+      ]
+    }
+  },
+
   compatibilityDate: '2025-04-02',
 })
