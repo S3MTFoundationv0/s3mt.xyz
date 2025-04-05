@@ -1,26 +1,5 @@
 <template>
   <div 
-    v-motion
-    :initial="{
-      opacity: 0,
-      y: 20,
-    }"
-    :enter="{
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 400,
-        ease: 'easeOut',
-      },
-    }"
-    :leave="{
-      opacity: 0,
-      y: -20,
-      transition: {
-        duration: 200,
-        ease: 'easeIn',
-      },
-    }"
     class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12"
   >
     <img src="/logo.svg" alt="S3MT Logo" class="h-40 w-auto mx-auto mb-6">
@@ -130,7 +109,7 @@
       </div>
 
       <!-- Table of Contents -->
-      <aside class="lg:w-1/4 lg:sticky lg:top-24 h-fit">
+      <aside class="lg:w-1/4 sticky top-24 h-fit">
         <nav class="space-y-2">
           <h3 class="text-xl font-semibold mb-3 text-white">Contents</h3>
           <a 
