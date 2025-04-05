@@ -44,30 +44,32 @@
           <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
             <span>Buy</span> <Logo size="sm" /> <span>Tokens</span>
           </h3>
-          <form @submit.prevent="handlePurchase">
-            <div class="mb-4">
-              <label for="solAmount" class="block text-sm font-medium text-gray-300 mb-1">Amount (SOL)</label>
-              <input 
-                type="number" 
-                id="solAmount" 
-                v-model="solAmount" 
-                placeholder="Enter SOL amount"
-                class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-primary"
-                required
+          <ClientOnly>
+            <form @submit.prevent="handlePurchase">
+              <div class="mb-4">
+                <label for="solAmount" class="block text-sm font-medium text-gray-300 mb-1">Amount (SOL)</label>
+                <input 
+                  type="number" 
+                  id="solAmount" 
+                  v-model="solAmount" 
+                  placeholder="Enter SOL amount"
+                  class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-primary"
+                  required
+                >
+              </div>
+              <p class="text-sm text-gray-400 mb-4">You will receive: {{ estimatedS3MT }} S3MT</p>
+              
+              <WalletMultiButton />
+              
+              <button 
+                type="submit" 
+                :disabled="!connected.value || loading" 
+                class="mt-4 w-full btn btn-primary disabled:opacity-50"
               >
-            </div>
-            <p class="text-sm text-gray-400 mb-4">You will receive: {{ estimatedS3MT }} S3MT</p>
-            
-            <WalletMultiButton />
-            
-            <button 
-              type="submit" 
-              :disabled="!wallet.connected || loading" 
-              class="mt-4 w-full btn btn-primary disabled:opacity-50"
-            >
-              {{ loading ? 'Processing...' : 'Buy Now' }}
-            </button>
-          </form>
+                {{ loading ? 'Processing...' : 'Buy Now' }}
+              </button>
+            </form>
+          </ClientOnly>
         </div>
       </div>
     </div>
@@ -76,10 +78,9 @@
 
 <script setup >
 import { ref, computed } from 'vue'
-import { useWallet } from '@solana/wallet-adapter-vue'
-import { WalletMultiButton } from '@solana/wallet-adapter-vue-ui'
+import { useWallet, WalletMultiButton } from 'solana-wallets-vue'
 
-const wallet = useWallet()
+const { connected, publicKey, sendTransaction } = useWallet()
 const solAmount = ref(0.1) // Default or minimum amount
 const loading = ref(false)
 
@@ -91,7 +92,7 @@ const estimatedS3MT = computed(() => {
 })
 
 const handlePurchase = async () => {
-  if (!wallet.connected.value || !wallet.publicKey.value || solAmount.value <= 0) {
+  if (!connected.value || !publicKey.value || solAmount.value <= 0) {
     console.error('Wallet not connected or invalid amount');
     // Add user feedback (e.g., toast notification)
     return;
@@ -100,11 +101,11 @@ const handlePurchase = async () => {
   loading.value = true;
   try {
     // --- TODO: Implement actual purchase logic --- 
-    // 1. Get wallet public key: wallet.publicKey.value
+    // 1. Get wallet public key: publicKey.value
     // 2. Get SOL amount: solAmount.value
     // 3. Call your backend or smart contract function to process the transaction
-    //    (This will likely involve signing a transaction with wallet.signTransaction)
-    console.log(`Attempting purchase: ${solAmount.value} SOL from ${wallet.publicKey.value.toBase58()}`);
+    //    (This will likely involve signing a transaction with sendTransaction)
+    console.log(`Attempting purchase: ${solAmount.value} SOL from ${publicKey.value.toBase58()}`);
     
     // Simulate transaction delay
     await new Promise(resolve => setTimeout(resolve, 2000)); 

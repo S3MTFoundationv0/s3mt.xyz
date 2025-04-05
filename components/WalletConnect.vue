@@ -1,34 +1,48 @@
 <template>
-  <div>
-    <button v-if="!connected" @click="connect" class="btn btn-primary">
-      Connect Wallet
-    </button>
-    <div v-else class="flex items-center space-x-2">
-      <span class="text-sm text-gray-300">{{ shortAddress }}</span>
-      <button @click="disconnect" class="btn btn-secondary text-sm">
-        Disconnect
-      </button>
+  <ClientOnly>
+    <div class="wallet-wrapper">
+      <template v-if="connected.value">
+        <div class="flex items-center space-x-2">
+          <span class="text-sm text-gray-300">{{ publicKeyShort }}</span>
+          <button @click="disconnect" class="btn btn-secondary text-sm">
+            Disconnect
+          </button>
+        </div>
+      </template>
+      <template v-else>
+        <button @click="handleConnect" class="btn btn-primary">
+          Connect Wallet
+        </button>
+      </template>
     </div>
-  </div>
+    <template #fallback>
+      <button class="btn btn-primary">
+        Connect Wallet
+      </button>
+    </template>
+  </ClientOnly>
 </template>
 
 <script setup>
-const connected = ref(false)
-const address = ref('')
+import { ref, computed, onMounted } from 'vue';
+import { useWallet } from 'solana-wallets-vue';
 
-const shortAddress = computed(() => {
-  if (!address.value) return ''
-  return `${address.value.slice(0, 6)}...${address.value.slice(-4)}`
-})
+// Use the wallet store from solana-wallets-vue
+const { connected, publicKey, connect, disconnect } = useWallet();
 
-async function connect() {
-  // Implement wallet connection logic
-  connected.value = true
-  address.value = '12345...abcde' // Placeholder
-}
+// Compute a shortened version of the public key
+const publicKeyShort = computed(() => {
+  if (!publicKey.value) return '';
+  const key = publicKey.value.toString();
+  return `${key.slice(0, 6)}...${key.slice(-4)}`;
+});
 
-function disconnect() {
-  connected.value = false
-  address.value = ''
-}
+// Handle connection errors
+const handleConnect = async () => {
+  try {
+    await connect();
+  } catch (error) {
+    console.error('Failed to connect wallet:', error);
+  }
+};
 </script>
