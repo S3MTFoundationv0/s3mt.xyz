@@ -17,9 +17,11 @@
         Smart. Secure. Sustainable. Join the movement where crypto meets clean energy.
       </p>
       <div class="flex gap-4 flex-wrap justify-center">
-        <NuxtLink to="/presale" class="btn btn-primary">Join Presale</NuxtLink>
+        <NuxtLink to="/presale" class="btn btn-primary">Buy Now</NuxtLink>
         <NuxtLink to="/whitepaper" class="btn btn-secondary">Learn More</NuxtLink>
       </div>
     </div>
   </section>
 </template>
+
+

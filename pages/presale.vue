@@ -1,32 +1,69 @@
 <template>
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <div class="max-w-2xl mx-auto">
-      <div class="card">
-        <h2 class="text-2xl font-bold mb-6">S3MT Token Presale</h2>
-        <div class="space-y-4">
-          <div class="flex justify-between">
-            <span>Price per token:</span>
-            <span>0.001 SOL</span>
+  <div 
+    v-motion
+    :initial="{ opacity: 0, scale: 0.95 }"
+    :enter="{
+      opacity: 1,
+      scale: 1,
+      transition: {
+        duration: 450,
+        ease: [0.22, 1, 0.36, 1], // Exaggerated easeOutBack-like curve
+      },
+    }"
+    class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12"
+  >
+    <h1 class="text-3xl font-bold text-center mb-8">S3MT Presale</h1>
+    
+    <div class="bg-gray-800 shadow-lg rounded-lg p-6 md:p-8">
+      <div class="grid md:grid-cols-2 gap-8 items-center">
+        
+        <!-- Left Side: Info & Timer -->
+        <div>
+          <h2 class="text-2xl font-semibold mb-4">Join the Future of Mining</h2>
+          <p class="text-gray-400 mb-6">
+            Secure your S3MT tokens at the best price before the official launch. 
+            Be part of the sustainable revolution in crypto.
+          </p>
+          
+          <!-- Placeholder for Countdown Timer -->
+          <div class="mb-6 p-4 bg-gray-700 rounded">
+            <p class="text-center text-lg font-medium">Presale Ends In:</p>
+            <p class="text-center text-2xl font-bold text-primary">[Countdown Timer Here]</p>
           </div>
-          <div class="flex justify-between">
-            <span>Minimum purchase:</span>
-            <span>100 S3MT</span>
+          
+          <div class="text-sm text-gray-500">
+            <p>Current Rate: 1 SOL = X S3MT</p>
+            <p>Total Raised: Y SOL / Z SOL Target</p>
           </div>
-          <div class="mt-6">
-            <label class="block text-sm font-medium text-gray-300">Amount (SOL)</label>
-            <input
-              type="number"
-              v-model="amount"
-              class="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2"
-            />
-          </div>
-          <button 
-            @click="purchaseTokens"
-            class="w-full btn btn-primary mt-4"
-            :disabled="!connected"
-          >
-            Purchase Tokens
-          </button>
+        </div>
+        
+        <!-- Right Side: Purchase Form -->
+        <div>
+          <h3 class="text-xl font-semibold mb-4">Buy S3MT Tokens</h3>
+          <form @submit.prevent="handlePurchase">
+            <div class="mb-4">
+              <label for="solAmount" class="block text-sm font-medium text-gray-300 mb-1">Amount (SOL)</label>
+              <input 
+                type="number" 
+                id="solAmount" 
+                v-model="solAmount" 
+                placeholder="Enter SOL amount"
+                class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-primary"
+                required
+              >
+            </div>
+            <p class="text-sm text-gray-400 mb-4">You will receive: {{ estimatedS3MT }} S3MT</p>
+            
+            <WalletMultiButton />
+            
+            <button 
+              type="submit" 
+              :disabled="!wallet.connected || loading" 
+              class="mt-4 w-full btn btn-primary disabled:opacity-50"
+            >
+              {{ loading ? 'Processing...' : 'Buy Now' }}
+            </button>
+          </form>
         </div>
       </div>
     </div>
@@ -34,10 +71,48 @@
 </template>
 
 <script setup>
-const amount = ref(0)
-const connected = ref(false) // Replace with actual wallet connection state
+import { ref, computed } from 'vue'
+import { WalletMultiButton, useWallet } from '@solana/wallet-adapter-vue'
 
-async function purchaseTokens() {
-  // Implement token purchase logic
+const wallet = useWallet()
+const solAmount = ref(0.1) // Default or minimum amount
+const loading = ref(false)
+
+// Replace with actual conversion rate
+const CONVERSION_RATE = 1000 // Example: 1 SOL = 1000 S3MT
+
+const estimatedS3MT = computed(() => {
+  return (solAmount.value * CONVERSION_RATE).toFixed(2)
+})
+
+const handlePurchase = async () => {
+  if (!wallet.connected.value || !wallet.publicKey.value || solAmount.value <= 0) {
+    console.error('Wallet not connected or invalid amount');
+    // Add user feedback (e.g., toast notification)
+    return;
+  }
+
+  loading.value = true;
+  try {
+    // --- TODO: Implement actual purchase logic --- 
+    // 1. Get wallet public key: wallet.publicKey.value
+    // 2. Get SOL amount: solAmount.value
+    // 3. Call your backend or smart contract function to process the transaction
+    //    (This will likely involve signing a transaction with wallet.signTransaction)
+    console.log(`Attempting purchase: ${solAmount.value} SOL from ${wallet.publicKey.value.toBase58()}`);
+    
+    // Simulate transaction delay
+    await new Promise(resolve => setTimeout(resolve, 2000)); 
+    
+    console.log('Purchase successful (simulated)');
+    // Add success feedback
+    solAmount.value = 0.1; // Reset amount
+
+  } catch (error) {
+    console.error('Purchase failed:', error);
+    // Add error feedback
+  } finally {
+    loading.value = false;
+  }
 }
 </script>

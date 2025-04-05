@@ -1,8 +1,13 @@
 <template>
   <div class="min-h-screen bg-gray-900 text-white">
     <NavBar />
-    <main>
-      <NuxtPage />
+    <main class="overflow-x-hidden">
+      <NuxtPage 
+        :transition="{
+          name: 'page',
+          mode: 'out-in'
+        }" 
+      />
     </main>
     <Footer />
   </div>

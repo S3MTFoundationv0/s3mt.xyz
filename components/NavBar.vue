@@ -11,6 +11,7 @@
               <NuxtLink to="/" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Home</NuxtLink>
               <NuxtLink to="/presale" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Presale</NuxtLink>
               <NuxtLink to="/swap" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Swap</NuxtLink>
+              <NuxtLink to="/whitepaper" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Whitepaper</NuxtLink>
             </div>
           </div>
         </div>

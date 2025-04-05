@@ -1,5 +1,5 @@
 export default defineNuxtConfig({
-  modules: ['@nuxtjs/tailwindcss'],
+  modules: ['@nuxtjs/tailwindcss', '@vueuse/motion/nuxt'],
 
   app: {
     head: {
@@ -20,5 +20,5 @@ export default defineNuxtConfig({
     }
   },
 
-  compatibilityDate: '2025-04-02'
+  compatibilityDate: '2025-04-02',
 })
