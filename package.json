@@ -19,6 +19,7 @@
     "@vueuse/motion": "3.0.3",
     "bs58": "^6.0.0",
     "buffer": "^6.0.3",
+    "date-fns": "^4.1.0",
     "fastestsmallesttextencoderdecoder": "^1.0.22",
     "nuxt": "^3.10.3",
     "react": "^19.1.0",
