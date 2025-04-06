@@ -1,57 +1,41 @@
 <template>
-  <div 
-    v-motion
-    :initial="{ opacity: 0, x: 50 }" 
-    :enter="{
-      opacity: 1,
-      x: 0, 
-      transition: {
-        duration: 450,
-        ease: 'easeOut',
-      },
-    }"
-    :leave="{ 
-      opacity: 0, 
-      x: -50, // Slide out left
-      transition: { duration: 200, ease: 'easeIn' } 
-    }"
-    class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12"
-  >
-    <div class="max-w-2xl mx-auto">
-      <div class="card">
-        <h2 class="text-2xl font-bold mb-6">Swap Tokens</h2>
-        <div class="space-y-6">
-          <div>
-            <label class="block text-sm font-medium text-gray-300">From</label>
-            <select v-model="fromToken" class="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2">
-              <option value="sol">SOL</option>
-              <option value="usdc">USDC</option>
-            </select>
-            <input
-              type="number"
-              v-model="fromAmount"
-              class="mt-2 block w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2"
-            />
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 animate__animated animate__fadeIn">
+    <!-- Header -->
+    <SwapHeader />
+    
+    <!-- Main Container -->
+    <div class="mt-8 mb-16">
+      <div class="grid md:grid-cols-2 gap-8 items-start">
+        <!-- Swap Form -->
+        <div>
+          <SwapForm 
+            :connected="connected" 
+            :loading="loading"
+            @swap="handleSwap"
+          />
+        </div>
+        
+        <!-- Swap Info -->
+        <div>
+          <div class="bg-gray-800/30 rounded-xl p-6 border border-gray-700">
+            <h3 class="text-xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-white to-indigo-300">Why Swap with S3MT?</h3>
+            <p class="text-gray-300 mb-6">Our swap protocol is designed to provide the best possible experience with favorable rates, no slippage, and low fees.</p>
+            
+            <SwapInfo />
           </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-300">To</label>
-            <div class="bg-gray-700 border border-gray-600 rounded-md px-3 py-2 flex items-center">
-              <Logo size="xs" /> 
-            </div>
-            <input
-              type="number"
-              v-model="toAmount"
-              disabled
-              class="mt-2 block w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2"
-            />
-          </div>
-          <button 
-            @click="swapTokens"
-            class="w-full btn btn-primary"
-            :disabled="!connected"
-          >
-            Swap
-          </button>
+        </div>
+      </div>
+      
+      <!-- Swap History -->
+      <div v-if="connected">
+        <SwapHistory :connected="connected" />
+      </div>
+      
+      <div v-else class="mt-16 max-w-2xl mx-auto text-center bg-indigo-900/20 rounded-lg p-6 border border-indigo-800/30">
+        <h3 class="text-xl font-bold mb-4 text-white">Connect Your Wallet</h3>
+        <p class="text-gray-300 mb-6">Connect your wallet to start swapping tokens and view your transaction history.</p>
+        <div class="flex justify-center">
+          <WalletMultiButton />
         </div>
       </div>
     </div>
@@ -59,12 +43,51 @@
 </template>
 
 <script setup>
-const fromToken = ref('sol')
-const fromAmount = ref(0)
-const toAmount = ref(0)
-const connected = ref(false) // Replace with actual wallet connection state
+import { ref } from 'vue'
+import { WalletMultiButton, useWallet } from 'solana-wallets-vue'
+import SwapHeader from '~/components/SwapHeader.vue'
+import SwapForm from '~/components/SwapForm.vue'
+import SwapInfo from '~/components/SwapInfo.vue'
+import SwapHistory from '~/components/SwapHistory.vue'
 
-async function swapTokens() {
-  // Implement token swap logic
+// Initialize Solana wallet adapter
+useSWV()
+const { connected, publicKey } = useWallet()
+const loading = ref(false)
+
+// Handle swap function
+async function handleSwap(swapDetails) {
+  if (!connected.value || !publicKey.value) {
+    console.error('Wallet not connected');
+    return;
+  }
+
+  loading.value = true;
+  try {
+    console.log(`Executing swap: ${swapDetails.fromAmount} ${swapDetails.fromToken} → ${swapDetails.toAmount} ${swapDetails.toToken}`);
+    
+    // Simulate transaction delay
+    await new Promise(resolve => setTimeout(resolve, 2000)); 
+    
+    console.log('Swap successful (simulated)');
+    // Here you would implement the actual swap logic
+    
+  } catch (error) {
+    console.error('Swap failed:', error);
+  } finally {
+    loading.value = false;
+  }
 }
+
+// Set page metadata
+useHead({
+  title: 'S3MT Token Swap',
+  meta: [
+    { name: 'description', content: 'Swap tokens with zero slippage at the best rates in the S3MT ecosystem.' }
+  ],
+})
 </script>
+
+<style>
+@import 'animate.css';
+</style>

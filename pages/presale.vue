@@ -1,130 +1,116 @@
 <template>
-  
-    <div 
-      v-motion
-      :initial="{ opacity: 0, scale: 0.95 }"
-      :enter="{
-        opacity: 1,
-        scale: 1,
-        transition: {
-          duration: 450,
-          ease: [0.22, 1, 0.36, 1], // Exaggerated easeOutBack-like curve
-        },
-      }"
-      class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12"
-    >
-      <h1 class="text-3xl font-bold text-center mb-8 flex justify-center items-center gap-2">
-        <Logo size="md" /> <span>Presale</span>
-      </h1>
+  <div class="mx-auto px-4 sm:px-6 lg:px-8 py-12 max-w-7xl">
+    <!-- Hero Section -->
+    <PresaleHeader />
+    
+    <!-- Main Content -->
+    <div class="mt-12 mb-20">
+      <!-- Stats Section -->
+      <div class="grid md:grid-cols-2 gap-8 mb-16">
+        <PresaleCountdown :end-date="presaleEndDate" />
+        <PresaleStats 
+          :conversion-rate="CONVERSION_RATE" 
+          :next-phase-rate="NEXT_PHASE_RATE"
+          :total-raised="TOTAL_RAISED"
+          :target-amount="TARGET_AMOUNT"
+        />
+      </div>
       
-      <div class="bg-gray-800 shadow-lg rounded-lg p-6 md:p-8">
-        <div class="grid md:grid-cols-2 gap-8 items-center">
-          
-          <!-- Left Side: Info & Timer -->
-          <div>
-            <h2 class="text-2xl font-semibold mb-4">Join the Future of Mining</h2>
-            <p class="text-gray-400 mb-6">
-              Secure your S3MT tokens at the best price before the official launch. 
-              Be part of the sustainable revolution in crypto.
-            </p>
-            
-            <!-- Countdown Timer -->
-            <div class="mb-6 p-4 bg-gray-700 rounded">
-              <p class="text-center text-lg font-medium mb-4">Presale Ends In:</p>
-              <CountdownTimer :end-date="presaleEndDate" />
-            </div>
-            
-            <div class="text-sm text-gray-500">
-              <p>Current Rate: 1 SOL = X S3MT</p>
-              <p>Total Raised: Y SOL / Z SOL Target</p>
-            </div>
-          </div>
-          
-          <!-- Right Side: Purchase Form -->
-          <div>
-            <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
-              <span>Buy</span> <Logo size="sm" /> <span>Tokens</span>
-            </h3>
-            <ClientOnly>
-              <form @submit.prevent="handlePurchase">
-                <div class="mb-4">
-                  <label for="solAmount" class="block text-sm font-medium text-gray-300 mb-1">Amount (SOL)</label>
-                  <input 
-                    type="number" 
-                    id="solAmount" 
-                    v-model="solAmount" 
-                    placeholder="Enter SOL amount"
-                    class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-primary"
-                    required
-                  >
-                </div>
-                <p class="text-sm text-gray-400 mb-4">You will receive: {{ estimatedS3MT }} S3MT</p>
-                
-                <WalletMultiButton />
-                
-                <button 
-                  type="submit" 
-                  :disabled="!connected.value || loading" 
-                  class="mt-4 w-full btn btn-primary disabled:opacity-50"
-                >
-                  {{ loading ? 'Processing...' : 'Buy Now' }}
-                </button>
-              </form>
-            </ClientOnly>
-          </div>
+      <!-- Trust Signals -->
+      <TrustSignals />
+      
+      <!-- Purchase Form -->
+      <div class="mt-16 max-w-lg mx-auto">
+        <PurchaseForm 
+          :connected="connected"
+          :loading="loading"
+          :conversion-rate="CONVERSION_RATE"
+          @purchase="handlePurchase"
+        />
+      </div>
+    </div>
+    
+    <!-- FAQ Section (Simple) -->
+    <div class="mt-20 mb-16 max-w-3xl mx-auto">
+      <h3 class="text-2xl font-bold mb-8 text-center text-transparent bg-clip-text bg-gradient-to-r from-white to-indigo-200">
+        Frequently Asked Questions
+      </h3>
+      
+      <div class="space-y-6">
+        <div class="bg-gray-800/70 rounded-xl p-5 border border-gray-700">
+          <h4 class="text-xl font-semibold text-white mb-3">How do I receive dividends?</h4>
+          <p class="text-gray-300">Dividends are automatically distributed to the wallet address holding S3MT tokens. Payments are made in Stablecoins and/or S3MT tokens, depending on the asset source and dividend type.</p>
+        </div>
+        
+        <div class="bg-gray-800/70 rounded-xl p-5 border border-gray-700">
+          <h4 class="text-xl font-semibold text-white mb-3">When does the token launch?</h4>
+          <p class="text-gray-300">The official launch date will be announced after the presale concludes. All presale participants will receive their tokens before the official launch.</p>
+        </div>
+        
+        <div class="bg-gray-800/70 rounded-xl p-5 border border-gray-700">
+          <h4 class="text-xl font-semibold text-white mb-3">What makes S3MT different?</h4>
+          <p class="text-gray-300">S3MT combines real-world asset backing with sustainable practices and a dividend system that rewards holders directly. This creates genuine value rather than relying solely on market speculation.</p>
         </div>
       </div>
     </div>
+  </div>
 </template>
 
-<script setup >
+<script setup>
 import { ref, computed } from 'vue'
-import { WalletMultiButton, useWallet } from 'solana-wallets-vue'
-import CountdownTimer from '~/components/CountdownTimer.vue'
+import { useWallet } from 'solana-wallets-vue'
+import PresaleHeader from '~/components/PresaleHeader.vue'
+import PresaleCountdown from '~/components/PresaleCountdown.vue'
+import PresaleStats from '~/components/PresaleStats.vue'
+import PurchaseForm from '~/components/PurchaseForm.vue'
+import TrustSignals from '~/components/TrustSignals.vue'
+
 useSWV()
 const { connected, publicKey, sendTransaction } = useWallet()
-const solAmount = ref(0.1) // Default or minimum amount
 const loading = ref(false)
 
 // Get presale end date from runtime config
 const config = useRuntimeConfig()
 const presaleEndDate = ref(config.public.presaleEndDate)
 
-// Replace with actual conversion rate
+// Stats for the presale (these would typically come from your API/contract)
 const CONVERSION_RATE = 1000 // Example: 1 SOL = 1000 S3MT
+const NEXT_PHASE_RATE = 800 // Next phase rate: 1 SOL = 800 S3MT
+const TOTAL_RAISED = 128.5 // Total SOL raised
+const TARGET_AMOUNT = 500 // Target SOL amount
 
-const estimatedS3MT = computed(() => {
-  return (solAmount.value * CONVERSION_RATE).toFixed(2)
-})
-
-const handlePurchase = async () => {
-  if (!connected.value || !publicKey.value || solAmount.value <= 0) {
+const handlePurchase = async (amount) => {
+  if (!connected.value || !publicKey.value || amount <= 0) {
     console.error('Wallet not connected or invalid amount');
-    // Add user feedback (e.g., toast notification)
     return;
   }
 
   loading.value = true;
   try {
     // --- TODO: Implement actual purchase logic --- 
-    // 1. Get wallet public key: publicKey.value
-    // 2. Get SOL amount: solAmount.value
-    // 3. Call your backend or smart contract function to process the transaction
-    //    (This will likely involve signing a transaction with sendTransaction)
-    console.log(`Attempting purchase: ${solAmount.value} SOL from ${publicKey.value.toBase58()}`);
+    console.log(`Attempting purchase: ${amount} SOL from ${publicKey.value.toBase58()}`);
     
     // Simulate transaction delay
     await new Promise(resolve => setTimeout(resolve, 2000)); 
     
     console.log('Purchase successful (simulated)');
-    // Add success feedback
-    solAmount.value = 0.1; // Reset amount
 
   } catch (error) {
     console.error('Purchase failed:', error);
-    // Add error feedback
   } finally {
     loading.value = false;
   }
 }
+
+// Set page metadata
+useHead({
+  title: 'S3MT Token Presale',
+  meta: [
+    { name: 'description', content: 'Join the S3MT presale and secure your tokens at the best price. Backed by real-world sustainable assets.' }
+  ],
+})
 </script>
+
+<style>
+@import 'animate.css';
+</style>
