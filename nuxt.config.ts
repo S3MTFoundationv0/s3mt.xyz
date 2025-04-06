@@ -20,6 +20,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       solanaNetwork: process.env.SOLANA_NETWORK || 'devnet',
+      presaleEndDate: process.env.PRESALE_END_DATE || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now by default
       motion: {
         directives: {
           // your motion directives if any
