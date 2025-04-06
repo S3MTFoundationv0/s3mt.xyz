@@ -2,14 +2,12 @@
   <div class="min-h-screen bg-gray-900 text-white flex flex-col">
     <NavBar />
     <main class="flex-grow">
-      <ClientOnly>
         <NuxtPage 
           :transition="{
             name: 'page',
             mode: 'out-in'
           }" 
         />
-      </ClientOnly>
     </main>
     <Footer />
   </div>
