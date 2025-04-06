@@ -28,10 +28,10 @@
               Be part of the sustainable revolution in crypto.
             </p>
             
-            <!-- Placeholder for Countdown Timer -->
+            <!-- Countdown Timer -->
             <div class="mb-6 p-4 bg-gray-700 rounded">
-              <p class="text-center text-lg font-medium">Presale Ends In:</p>
-              <p class="text-center text-2xl font-bold text-primary">[Countdown Timer Here]</p>
+              <p class="text-center text-lg font-medium mb-4">Presale Ends In:</p>
+              <CountdownTimer :end-date="presaleEndDate" />
             </div>
             
             <div class="text-sm text-gray-500">
@@ -80,10 +80,15 @@
 <script setup >
 import { ref, computed } from 'vue'
 import { WalletMultiButton, useWallet } from 'solana-wallets-vue'
+import CountdownTimer from '~/components/CountdownTimer.vue'
 useSWV()
 const { connected, publicKey, sendTransaction } = useWallet()
 const solAmount = ref(0.1) // Default or minimum amount
 const loading = ref(false)
+
+// Get presale end date from runtime config
+const config = useRuntimeConfig()
+const presaleEndDate = ref(config.public.presaleEndDate)
 
 // Replace with actual conversion rate
 const CONVERSION_RATE = 1000 // Example: 1 SOL = 1000 S3MT
