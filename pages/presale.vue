@@ -1,5 +1,5 @@
 <template>
-  <ClientOnly>
+  
     <div 
       v-motion
       :initial="{ opacity: 0, scale: 0.95 }"
@@ -45,7 +45,7 @@
             <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
               <span>Buy</span> <Logo size="sm" /> <span>Tokens</span>
             </h3>
-            
+            <ClientOnly>
               <form @submit.prevent="handlePurchase">
                 <div class="mb-4">
                   <label for="solAmount" class="block text-sm font-medium text-gray-300 mb-1">Amount (SOL)</label>
@@ -70,18 +70,17 @@
                   {{ loading ? 'Processing...' : 'Buy Now' }}
                 </button>
               </form>
-            
+            </ClientOnly>
           </div>
         </div>
       </div>
     </div>
-  </ClientOnly>
 </template>
 
 <script setup >
 import { ref, computed } from 'vue'
 import { WalletMultiButton, useWallet } from 'solana-wallets-vue'
-
+useSWV()
 const { connected, publicKey, sendTransaction } = useWallet()
 const solAmount = ref(0.1) // Default or minimum amount
 const loading = ref(false)
