@@ -1,0 +1,31 @@
+# Git
+.git
+.gitignore
+
+# Node
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Nuxt build artifacts & cache
+.nuxt
+.output
+dist
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+*.local
+
+# Docker
+Dockerfile
+docker-compose.yml
+Makefile
+entrypoint.sh
+haproxy.cfg 
+
+# Rust
+target
