@@ -1,0 +1,20 @@
+include make/common.mk
+
+include make/append.mk
+include make/build.mk
+include make/dev.mk
+include make/down.mk
+include make/exec.mk
+include make/import-vector.mk
+include make/logs.mk
+include make/pull.mk
+include make/reboot.mk
+include make/rebuild.mk
+include make/restart.mk
+include make/run.mk
+include make/sh.mk
+include make/up.mk
+include make/start.mk
+include make/add-app.mk
+include make/launch.mk
+include make/update.mk

@@ -1,0 +1,19 @@
+include:
+  - ./traefik.yml
+
+services:
+  s3mt.xyz:
+    image: ghcr.io/s3mtfoundation/s3mt.xyz:${S3MT_XYZ_IMAGE_TAG:-latest}
+    container_name: s3mt.xyz
+    depends_on:
+      - traefik
+    env_file:
+      - ../.config/.env.secrets
+      - ../.config/.env.shared
+      - ../.config/.env.s3mt.xyz
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.s3mt.rule=Host(`s3mtxyz.localhost`) && (PathPrefix(`/`)||PathPrefix(`/_nuxt_devtools__`))"
+      - "traefik.http.services.s3mt.loadbalancer.server.port=80"
+    working_dir: /app
+    tty: true

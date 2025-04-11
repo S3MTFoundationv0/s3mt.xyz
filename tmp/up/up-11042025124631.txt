@@ -1,0 +1,1 @@
+-f docker/.compose/s3mt.xyz.yml -f docker/.compose/traefik.yml -f docker/.compose/s3mt.xyz-dev.yml

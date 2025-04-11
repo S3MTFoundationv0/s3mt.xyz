@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  traefik:
+    image: "traefik:v3.1" # Use a specific version
+    container_name: "traefik"
+    command:
+      - "--api.insecure=true" # Enable web UI (for debugging) on port 8080
+      - "--providers.docker=true" # Enable Docker provider
+      - "--providers.docker.exposedbydefault=false" # Don't expose containers unless labelled
+      - "--entrypoints.web.address=:80" # Define an entrypoint for HTTP traffic on port 80
+      # Add more Traefik configs here (TLS, etc.) if needed later
+    ports:
+      - "80:80"       # Map host port 80 to Traefik's port 80
+      - "8080:8080"   # Map host port 8080 to Traefik's API/Dashboard
+      # - "443:443"   # Uncomment if you add HTTPS later
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro" # Mount Docker socket (read-only)
+    networks:
+      - webproxy # Use a custom network
+
+  app:
+    build:
+      context: .
+      target: development # Build the development stage by default for 'docker compose up'
+    container_name: s3mt-app-dev # Or your preferred name
+    volumes:
+      # Mount source code, excluding node_modules
+      - .:/app
+      - /app/node_modules # Anonymous volume to prevent host node_modules overwriting container's
+      - /app/.nuxt # Persist Nuxt cache/build artifacts if needed between runs
+      - /app/.output # Persist Nuxt output if needed
+    environment:
+      # Pass any necessary environment variables for development
+      # Example: HOST: 0.0.0.0 (though nuxi dev --host handles this)
+      # NUXT_PUBLIC_API_URL: http://localhost:5000 # Example
+      NODE_ENV: development
+      # If your app needs .env variables, consider how to manage them securely
+      # DO NOT commit .env to git. You might volume mount it:
+      # - ./.env:/app/.env:ro
+    labels:
+      - "traefik.enable=true" # Tell Traefik to manage this container
+      # Router definition: Listen for requests on the 'web' entrypoint (port 80)
+      - "traefik.http.routers.app-http.entrypoints=web"
+      # Rule: Match all hostnames (adjust if you have a specific domain)
+      - "traefik.http.routers.app-http.rule=HostRegexp(`{host:.+}`)"
+      # Service definition: Tell Traefik where to forward the traffic
+      - "traefik.http.services.app-service.loadbalancer.server.port=80" # Forward to HAProxy port 80 inside this container
+    networks:
+      - webproxy # Connect to the same network as Traefik
+    # No 'ports' needed here, Traefik handles external exposure
+
+networks:
+  webproxy:
+    name: webproxy_network # Explicitly name the network 
