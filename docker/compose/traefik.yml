@@ -1,7 +1,7 @@
 services:
   traefik:
-    container_name: traefik
-    image: traefik:${TRAEFIK_IMAGE_TAG:-latest}
+    container_name: s3mt-foundation-traefik
+    image: ghcr.io/s3mtfoundation/traefik:${TRAEFIK_IMAGE_TAG:-latest}
     ports:
       - "80:80"
       - "443:443"
