@@ -100,8 +100,8 @@ run_service_in_context() {
     done <<<"$files "
 
     # Get the IP address of the Traefik container
-    TRAEFIK_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' traefik)
-
+    #TRAEFIK_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' traefik)
+    TRAEFIK_IP=127.0.0.1
     # Check if the IP address was found
     if [ -z "$TRAEFIK_IP" ]; then
         echo "docker compose $files up -d $service with no traefik"
@@ -111,7 +111,7 @@ run_service_in_context() {
         exit 0
     fi
 
-    extra_hosts_entry="- \"connect.localhost:$TRAEFIK_IP\""
+    extra_hosts_entry="- \"s3mt.xyz.localhost:$TRAEFIK_IP\""
 
     # Process each compose file
     for i in "${!file_array[@]}"; do
