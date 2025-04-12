@@ -9,6 +9,9 @@ entryPoints:
     address: ":80"
   https:
     address: ":443"
+    http:
+      tls:
+        certResolver: letsencrypt
 
 api:
   dashboard: true
@@ -29,3 +32,11 @@ tls:
       keyFile: /certs/localhost.localdomain.key
       stores:
         - default
+
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: "mike@pricelove.co"
+      storage: acme.json
+      httpChallenge:
+        entryPoint: http
