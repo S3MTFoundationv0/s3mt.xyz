@@ -1,0 +1,29 @@
+#!/bin/sh
+
+HOST=${1:-s3mt.xyz}
+CERTFILE_NAME=${2:-${HOST}.fullchain.pem}
+
+# Check if the SSL certificate file exists and is not empty
+if [ ! -s /etc/ssl/$CERTFILE_NAME ]; then
+    echo "SSL certificate not found or empty. Generating a new certificate using Let's Encrypt..."
+
+    # Ensure certbot is installed
+    if ! command -v certbot >/dev/null 2>&1; then
+        echo "Certbot not found. Installing certbot..."
+        apt-get update
+        apt-get install -y certbot
+    fi
+
+    # Generate the certificate using certbot
+    certbot certonly --standalone -d $HOST --non-interactive --agree-tos --email dev@$HOST
+
+    # Copy the generated certificate to the appropriate location
+    cp /etc/letsencrypt/live/$HOST/fullchain.pem /etc/ssl/$CERTFILE_NAME
+    cp /etc/letsencrypt/live/$HOST/privkey.pem /etc/ssl/$CERTFILE_NAME
+
+    echo "SSL certificate generated and copied to /etc/ssl/$CERTFILE_NAME and /etc/ssl/$HOST.pem"
+else
+    echo "SSL certificate already exists and is not empty."
+fi
+
+# End Generation Here

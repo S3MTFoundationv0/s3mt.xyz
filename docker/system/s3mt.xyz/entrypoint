@@ -72,6 +72,11 @@ _main() {
 
   _configureHAProxy $IMAGE_VERSION $NUXT_NUM_PROCS
 
+  if [ -n "$HOST_NAME" ]; then
+    echo "Provisioning JIT SSL for $HOST_NAME"
+    provision-jit-ssl $HOST_NAME
+  fi
+
   exec haproxy -W -db -f /etc/haproxy/haproxy.cfg
 }
 
