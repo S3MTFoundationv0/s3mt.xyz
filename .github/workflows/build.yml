@@ -22,6 +22,8 @@ jobs:
         run: |
           source docker/compose/.env
           make build s=${PROJECT}
+        env:
+          FULLCHAIN_TLS: ${{ secrets.FULLCHAIN_TLS }}
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
