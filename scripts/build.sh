@@ -2,26 +2,31 @@
 
 set -e
 
+source docker/compose/.env
+
 source scripts/common.sh
 
 SERVICE=$(echo $1 | tr '[:upper:]' '[:lower:]')
 
 TAG=${2:-latest}
 
-BASE_TAG=ghcr.io/s3mtfoundation/$SERVICE:$TAG
+BUILD_TYPE=${3:-base}
+
+BASE_TAG=$CONTAINER_REGISTRY/$ORGANIZATION/$SERVICE:$TAG
 
 ENV_VAR=$(convert_service_to_env_var "$SERVICE")
 
-CURRENT_DIR=$(pwd)
-
 IMAGE_VERSION=$(get_image_version)
 
-BASE_FILE=docker/dockerfiles/$SERVICE/base.dockerfile
+BASE_FILE=docker/dockerfiles/$SERVICE/$BUILD_TYPE.dockerfile
 
-cd $CURRENT_DIR
+if [ ! -f $BASE_FILE ]; then
+    echo "Dockerfile not found: $BASE_FILE"
+    exit 1
+fi
 
-if [ -f scripts/prebuild/${service}.sh ]; then
-    echo "Running prebuild script for $service"
+if [ -f scripts/prebuild/${SERVICE}.sh ]; then
+    echo "Running prebuild script for $SERVICE"
     scripts/prebuild/${service}.sh
 fi
 

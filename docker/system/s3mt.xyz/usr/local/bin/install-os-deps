@@ -1,0 +1,3 @@
+#!/bin/sh
+
+apk add --no-cache jq haproxy sudo supervisor yarn git make gcc g++ linux-headers eudev-dev

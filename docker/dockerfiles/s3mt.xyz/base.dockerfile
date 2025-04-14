@@ -9,6 +9,7 @@ ARG S3MT_VERSION
 
 ENV APP_ROOT=/app
 ENV HOST=0.0.0.0
+ENV HOST_NAME=${HOST_NAME:-s3mt.xyz}
 ENV IMAGE_VERSION=${IMAGE_VERSION}
 ENV NPM_CONFIG_LOGLEVEL=warn
 ENV NODE_ENV=${NODE_ENV:-production}
@@ -22,13 +23,14 @@ WORKDIR $APP_ROOT
 EXPOSE 80
 ENTRYPOINT [ "/entrypoint" ]
 
-RUN apk add --no-cache jq haproxy sudo supervisor yarn git make gcc g++ linux-headers eudev-dev
+COPY ./docker/system/s3mt.xyz /
+
+RUN install-os-deps
 
 RUN mkdir -p /var/log/supervisor
 
 RUN yarn global add merge-packages tsx --prefix /usr/local
 
-COPY ./docker/system/s3mt.xyz /
 RUN chown -R nobody:nobody $APP_ROOT
 
 RUN yarn-install -b
