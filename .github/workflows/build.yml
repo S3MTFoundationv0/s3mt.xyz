@@ -21,7 +21,7 @@ jobs:
       - name: Run make build
         run: |
           source docker/compose/.env
-          make build s=${PROJECT}
+          make rebuild s=${PROJECT} t=latest
         env:
           FULLCHAIN_TLS: ${{ secrets.FULLCHAIN_TLS }}
 

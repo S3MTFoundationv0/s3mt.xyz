@@ -11,3 +11,6 @@ get_cmd = $(if $(cmd),$(cmd),$(if $(c),$(c),$(error "Error: No command specified
 
 # Helper function to optionally get the tag parameter
 get_tag = $(if $(tag),$(tag),$(if $(t),$(t),$(info "Info: no tag specified. Defaulting to 'latest'.")))
+
+# Helper function to optionally get the type parameter
+get_type = $(if $(type),$(type),$(if $(T),$(T),$(info "Info: no type specified. Defaulting to 'base'.")))
