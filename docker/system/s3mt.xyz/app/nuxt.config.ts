@@ -60,6 +60,7 @@ export default defineNuxtConfig({
     resolve: {
       alias: {
         buffer: 'buffer/',
+        '@coral-xyz/anchor': '@coral-xyz/anchor/dist/browser/index.js'
       }
     },
     // Ensure browser environment

@@ -87,6 +87,17 @@
           <p class="mb-2 text-lg font-mono bg-gray-800 p-3 rounded"><code>Burn Return = ((Total Treasury Value + Total Asset Value) / Total S3MT Supply) * 80%</code></p>
           <p class="mb-4 text-lg leading-relaxed">Example: With a $10M Treasury and $80M in Assets ($90M total) and 50M S3MT supply:</p>
           <p class="mb-6 text-lg font-mono bg-gray-800 p-3 rounded"><code>( $90,000,000 / 50,000,000 S3MT ) * 80% = $1.80 * 80% = $1.44 per S3MT burn return</code></p>
+          <div class="mt-6">
+            <NuxtLink 
+              to="/tokenomics" 
+              class="btn btn-primary btn-md inline-flex items-center gap-2"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Explore Full Tokenomics</span>
+            </NuxtLink>
+          </div>
         </WhitepaperSection>
 
         <SectionDivider />
