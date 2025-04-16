@@ -16,7 +16,7 @@
           <div v-for="(item, index) in animatedDistribution" :key="item.label" class="mb-5">
             <div class="flex justify-between text-base font-medium mb-2 text-neutral-content/90">
               <span>{{ item.label }}</span>
-              <span>{{ distribution[index].value }}%</span>
+              <span>{{ Math.round(item.animatedValue) }}%</span>
             </div>
             <ThemedProgressBar :value="item.animatedValue" />
           </div>
