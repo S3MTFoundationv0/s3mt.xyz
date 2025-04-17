@@ -52,18 +52,19 @@
           
           <p class="mb-6 text-lg leading-relaxed">While the S3MT token price will ultimately be determined by market forces, its initial structure and distribution are designed for sustainable growth and rewarding holders.</p>
           
-          <h3 class="text-2xl font-semibold mb-3 mt-6 text-indigo-300">Minting & Initial Distribution (Post-Launch)</h3>
+          <h3 class="text-2xl font-semibold mb-3 mt-6 text-indigo-300">Minting & Distribution (Post-Launch)</h3>
+          <p class="mb-4 text-lg leading-relaxed">Each Token will start out at $0.10 each.</p>
           <ul class="list-disc ml-6 space-y-2 mb-4 text-lg">
-            <li>A buyer sends 1 USDC (or equivalent) to the contract address.</li>
-            <li>1000 S3MT tokens are minted.</li>
-            <li>The buyer receives 80% (800 S3MT) to their wallet.</li>
-            <li>The S3MT Foundation receives 20% (200 S3MT) allocated as follows:
+            <li>A buyer sends 10 USDC (or equivalent) to the contract address.</li>
+            <li>120 S3MT added to account</li>
+            <li>The buyer receives 100 S3MT allocation.</li>
+            <li>The S3MT Foundation receives 20 S3MT allocated as follows:
               <ul class="list-circle ml-6 mt-2 space-y-1">
-                <li>7.5% Operations</li>
-                <li>2.5% Developers</li>
-                <li>2.5% Marketing</li>
-                <li>5.0% Discretionary (Airdrops, rewards, liquidity pools)</li>
-                <li>2.5% Founders</li>
+                <li>7 Operations</li>
+                <li>3 Developers</li>
+                <li>2 Marketing</li>
+                <li>5 Discretionary (Airdrops, rewards, liquidity pools, staking rewards)</li>
+                <li>3 Founders</li>
               </ul>
             </li>
           </ul>
@@ -71,13 +72,15 @@
           <h3 class="text-2xl font-semibold mb-3 mt-6 text-indigo-300">Pre-Launch & Founder Benefits</h3>
           <p class="mb-4 text-lg leading-relaxed">Early participation offers increased token shares for the buyer, enhancing potential rewards:</p>
           <ul class="list-disc ml-6 space-y-2 mb-4 text-lg">
-            <li>Founders: 100.00% Buyer Share</li>
-            <li>Pre-Family: 95.00% Buyer Share</li>
-            <li>Pre-Launch: 90.00% Buyer Share</li>
-            <li>Launch Mode: 85.00% Buyer Share</li>
-            <li>Post Launch: 80.00% Buyer Share</li>
+            <li>Founders: 180% token share – total allocation 180,000,000 – effective token price $0.02</li>
+            <li>Pre-Family: 150% token share – total allocation 180,000,000 – effective token price $0.05</li>
+            <li>Pre-Launch: 130% token share – total allocation 180,000,000 – effective token price $0.07</li>
+            <li>Launch Mode: 120% token share – total allocation 180,000,000 – effective token price $0.08</li>
+            <li>Post Launch: 100% token share – total allocation 280,000,000 – effective token price $0.10</li>
+            <li>Moon – Tokens reach $1 on CEX/DEX</li>
           </ul>
-          <p class="mb-4 text-lg leading-relaxed">Holders of Founder tokens are perpetually eligible for the 2.5% founder mint distribution. These benefits are linked to a Founder NFT, which must be held in the same wallet as the S3MT tokens. Founder NFTs are tradable.</p>
+          <p class="mb-4 text-lg leading-relaxed">Holders of Founder tokens are perpetually eligible for the founder mint distribution as well as an additional 3% split share of all mining and staking rewards by holding a founders NFT. Earn a founders NFT by minting 100,000 tokens. Founder NFT must be held in the same wallet as the S3MT tokens. Founder NFTs are tradable.</p>
+          <p class="mb-4 text-lg leading-relaxed">Additional token mints will be controlled by a DAO where all holders can stake and vote on S3MT Improvement Protocols.</p>
           
           <h3 class="text-2xl font-semibold mb-3 mt-6 text-indigo-300">Dividends</h3>
           <p class="mb-4 text-lg leading-relaxed">Dividends derived from asset performance are paid directly to the wallet address holding the S3MT token. Payments are made in Stablecoins and/or S3MT tokens, depending on the asset source and dividend type. 100% of net asset rewards are distributed to S3MT holders.</p>
