@@ -13,11 +13,11 @@
             </svg>
           </template>
           
-          <p class="mb-4 text-lg leading-relaxed">S3MT offers a Simple, Smart, and Sustainable approach to tokenizing, optimizing, and distributing rewards derived from real-world assets, primarily crypto mining and sustainable mineral mining. Holding the S3MT token entitles owners to dividends generated from the entire ecosystem's assets and transaction activities. Initially launched on Solana, S3MT is designed for future cross-chain expansion. The ecosystem is governed by a Decentralized Autonomous Organization (DAO) supported by a purpose-built AI companion aimed at maximizing reward distribution.</p>
+          <p class="mb-4 text-lg leading-relaxed">S3MT offers a Simple, Smart, and Sustainable approach to tokenizing, optimizing, and distributing rewards derived from real-world assets, primarily crypto mining and sustainable mineral mining. Holding the S3MT token entitles owners to yield generated from the entire ecosystem's assets and transaction activities. Initially launched on Solana, S3MT is designed for future cross-chain expansion. The ecosystem is governed by a Decentralized Autonomous Organization (DAO) supported by a purpose-built AI companion aimed at maximizing reward distribution.</p>
           <p class="mb-4 text-lg font-medium">Key aspects include:</p>
           <ul class="list-disc ml-6 space-y-2 mb-6 text-lg">
             <li>Real-world asset backing (Sustainable Bitcoin & Silver Mining).</li>
-            <li>Dividend distribution to token holders (Stablecoins and/or S3MT).</li>
+            <li>Yield distribution to token holders (Stablecoins and/or S3MT).</li>
             <li>Transition towards DAO-based governance.</li>
             <li>Focus on sustainability and trust.</li>
           </ul>
@@ -32,10 +32,10 @@
             </svg>
           </template>
           
-          <p class="mb-6 text-lg leading-relaxed">The S3MT Treasury invests collected funds into tangible, income-generating assets focused on sustainability:</p>
+          <p class="mb-6 text-lg leading-relaxed">The S3MT Treasury allocates collected funds into tangible, income-generating assets focused on sustainability:</p>
           
           <h3 class="text-2xl font-semibold mb-3 mt-6 text-indigo-300">Sustainable Bitcoin Mining</h3>
-          <p class="mb-4 text-lg leading-relaxed">S3MT prioritizes Bitcoin mining operations that predominantly utilize renewable and clean energy sources, such as partnerships with clean energy providers (e.g., leveraging palm oil operations in Guatemala). The S3MT DAO acquires shares in public and private mining operations demonstrating positive EBITDA and favorable yields. All proceeds, yields, and other income or dividends generated are distributed directly to S3MT token holders via the network.</p>
+          <p class="mb-4 text-lg leading-relaxed">S3MT prioritizes Bitcoin mining operations that predominantly utilize renewable and clean energy sources, such as partnerships with clean energy providers (e.g., leveraging palm oil operations in Guatemala). The S3MT DAO acquires shares in public and private mining operations demonstrating positive EBITDA and favorable yields. All proceeds, yields, and other income generated are distributed directly to S3MT token holders via the network.</p>
           
           <h3 class="text-2xl font-semibold mb-3 mt-6 text-indigo-300">Sustainable Mineral Mining (Silver Focus)</h3>
           <p class="mb-4 text-lg leading-relaxed">S3MT takes an innovative approach to mineral assets, primarily silver. Instead of physical extraction, we focus on tokenizing certified mineral reserves, keeping the vast majority (99%) of the minerals securely in the ground. World-renowned geologists provide certifications, which are immutably recorded on the blockchain alongside share purchase agreements detailing sustainability commitments and purchasing thresholds. S3MT purchases shares in mines, bullion, certificates, and related instruments, with all transactions transparently recorded on the blockchain. While preserving resources, S3MT also supports genuinely sustainable traditional mining efforts by local and indigenous communities. Profits from asset management and any sustainable extraction efforts are distributed to token holders through the S3MT network.</p>
@@ -82,8 +82,8 @@
           <p class="mb-4 text-lg leading-relaxed">Holders of Founder tokens are perpetually eligible for the founder mint distribution as well as an additional 3% split share of all mining and staking rewards by holding a founders NFT. Earn a founders NFT by minting 100,000 tokens. Founder NFT must be held in the same wallet as the S3MT tokens. Founder NFTs are tradable.</p>
           <p class="mb-4 text-lg leading-relaxed">Additional token mints will be controlled by a DAO where all holders can stake and vote on S3MT Improvement Protocols.</p>
           
-          <h3 class="text-2xl font-semibold mb-3 mt-6 text-indigo-300">Dividends</h3>
-          <p class="mb-4 text-lg leading-relaxed">Dividends derived from asset performance are paid directly to the wallet address holding the S3MT token. Payments are made in Stablecoins and/or S3MT tokens, depending on the asset source and dividend type. 100% of net asset rewards are distributed to S3MT holders.</p>
+          <h3 class="text-2xl font-semibold mb-3 mt-6 text-indigo-300">Yield</h3>
+          <p class="mb-4 text-lg leading-relaxed">Yield derived from asset performance are sent directly to the wallet address holding the S3MT token. Payments are made in Stablecoins and/or S3MT tokens, depending on the asset source and yield type. 100% of net rewards are distributed to S3MT holders.</p>
           
           <h3 class="text-2xl font-semibold mb-3 mt-6 text-indigo-300">Burn Mechanism</h3>
           <p class="mb-4 text-lg leading-relaxed">A token burn mechanism is tied to the underlying asset value:</p>
@@ -112,7 +112,7 @@
             </svg>
           </template>
           
-          <p class="mb-4 text-lg leading-relaxed">S3MT is fundamentally designed as a trustworthy investment vehicle backed by real-world assets, distinct from speculative meme coins. Initial asset management is handled by our registered entity in the BVI (BolsaDx Holding Ltd.). As the ecosystem matures and assets grow, governance will transition to a DAO. We plan to implement a governance model inspired by established projects like Helium (HNT), enabling S3MT token holders to stake their tokens and vote on investment proposals, operational decisions, and the future direction of the asset portfolio.</p>
+          <p class="mb-4 text-lg leading-relaxed">S3MT is fundamentally designed as a trustworthy financial instrument backed by real-world assets, distinct from speculative meme coins. Initial asset management is handled by our registered entity in the BVI (BolsaDx Holding Ltd.). As the ecosystem matures and assets grow, governance will transition to a DAO. We plan to implement a governance model inspired by established projects like Helium (HNT), enabling S3MT token holders to stake their tokens and vote on proposals, operational decisions, and the future direction of the asset portfolio.</p>
         </WhitepaperSection>
         
         <SectionDivider />
@@ -124,7 +124,7 @@
             </svg>
           </template>
           
-          <p class="mb-4 text-lg leading-relaxed">Complementary to the asset-backed token, S3MT plans to launch stablecoins pegged to Latin American currencies (e.g., Mexican Peso, USD-equivalent Pesos). This initiative aims to facilitate low-cost, efficient cross-border payments and enhance financial accessibility within the region. Profits from related exchange activities (e.g., BolsaDx) will also contribute to the S3MT dividend pool.</p>
+          <p class="mb-4 text-lg leading-relaxed">Complementary to the asset-backed token, S3MT plans to launch stablecoins pegged to Latin American currencies (e.g., Mexican Peso, USD-equivalent Pesos). This initiative aims to facilitate low-cost, efficient cross-border payments and enhance financial accessibility within the region. Profits from related exchange activities (e.g., BolsaDx) will also contribute to the S3MT yield pool.</p>
         </WhitepaperSection>
         
         <SectionDivider />

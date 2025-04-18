@@ -38,8 +38,8 @@
       
       <div class="space-y-6">
         <div class="bg-gray-800/70 rounded-xl p-5 border border-gray-700">
-          <h4 class="text-xl font-semibold text-white mb-3">How do I receive dividends?</h4>
-          <p class="text-gray-300">Dividends are automatically distributed to the wallet address holding S3MT tokens. Payments are made in Stablecoins and/or S3MT tokens, depending on the asset source and dividend type.</p>
+          <h4 class="text-xl font-semibold text-white mb-3">How do I receive yields?</h4>
+          <p class="text-gray-300">Yields are automatically distributed to the wallet address holding S3MT tokens. Payments are made in Stablecoins and/or S3MT tokens, depending on the asset source and yield type.</p>
         </div>
         
         <div class="bg-gray-800/70 rounded-xl p-5 border border-gray-700">
@@ -49,7 +49,7 @@
         
         <div class="bg-gray-800/70 rounded-xl p-5 border border-gray-700">
           <h4 class="text-xl font-semibold text-white mb-3">What makes S3MT different?</h4>
-          <p class="text-gray-300">S3MT combines real-world asset backing with sustainable practices and a dividend system that rewards holders directly. This creates genuine value rather than relying solely on market speculation.</p>
+          <p class="text-gray-300">S3MT combines real-world asset backing with sustainable practices and a yield system that rewards holders directly. This creates genuine value rather than relying solely on market speculation.</p>
         </div>
       </div>
     </div>

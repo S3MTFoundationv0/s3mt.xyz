@@ -26,7 +26,7 @@
           </div>
           <h4 class="text-xl font-semibold text-white">Passive Income</h4>
         </div>
-        <p class="text-gray-300">Receive regular dividends derived from mining operations and asset performance, paid directly to your wallet in stablecoins or S3MT tokens.</p>
+        <p class="text-gray-300">Receive regular yields derived from mining operations and asset performance, paid directly to your wallet in stablecoins or S3MT tokens.</p>
       </div>
       
       <div class="bg-gray-800/70 rounded-xl p-5 border border-gray-700 hover:border-indigo-500/20 shadow-md transition-all duration-300 hover:transform hover:scale-[1.02]">
@@ -82,7 +82,7 @@
           <svg class="absolute text-indigo-600 fill-current w-12 h-12 -top-6 -left-6 opacity-25" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
             <path d="M9.983 3v7.391c0 5.704-3.731 9.57-8.983 10.609l-.995-2.151c2.432-.917 3.995-3.638 3.995-5.849h-4v-10h9.983zm14.017 0v7.391c0 5.704-3.748 9.571-9 10.609l-.996-2.151c2.433-.917 3.996-3.638 3.996-5.849h-3.983v-10h9.983z" />
           </svg>
-          <p class="text-gray-300 italic mb-4">The dividends system creates actual value for holders. It's refreshing to see a token focused on generating real returns instead of just hype.</p>
+          <p class="text-gray-300 italic mb-4">The yield system creates actual value for holders. It's refreshing to see a token focused on generating real returns instead of just hype.</p>
           <div class="flex items-center">
             <div class="font-medium text-indigo-300">Maria K.</div>
             <span class="mx-2 text-gray-500">•</span>
