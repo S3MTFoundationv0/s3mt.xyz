@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { useWallet } from 'solana-wallets-vue'
+import { useWallet, useAnchorWallet } from 'solana-wallets-vue'
 import { Connection, PublicKey, SystemProgram, SYSVAR_CLOCK_PUBKEY, LAMPORTS_PER_SOL } from '@solana/web3.js'
 import { AnchorProvider, Program, BN } from '@coral-xyz/anchor'
+import { PhantomWalletAdapter, SolflareWalletAdapter } from '@solana/wallet-adapter-wallets'
 import { getAssociatedTokenAddress, TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import presaleIdl from '~/programs/s3mt_presale.idl.json'
 
@@ -22,7 +23,8 @@ const totalCost = computed(() => PRICE * amount.value)
 const isValid = computed(() => amount.value > 0)
 
 // Wallet & UI state
-const { connected, publicKey, sendTransaction, signTransaction, wallet } = useWallet()
+const { connected, publicKey } = useWallet()
+const wallet = useAnchorWallet()
 
 const loading = ref(false)
 const success = ref(false)
@@ -100,7 +102,7 @@ async function onPurchase() {
     const programId = new PublicKey(presaleProgramId)
     const provider = new AnchorProvider(
         connection,
-        wallet,
+        wallet.value,
         { commitment: 'confirmed' }
       );
     const program = new Program(fixIdlPublicKeys(presaleIdl), provider)
