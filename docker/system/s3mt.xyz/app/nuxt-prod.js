@@ -43,6 +43,9 @@ const setupNuxtEnv = () => {
   process.env.NUXT_PUBLIC_API_URL = originalEnv.API_URL
   process.env.NUXT_PUBLIC_API_PORT = originalEnv.API_PORT
   process.env.NUXT_PUBLIC_APP_HOST = originalEnv.APP_HOST
+  process.env.NUXT_PUBLIC_SOLANA_NETWORK = originalEnv.SOLANA_NETWORK
+  process.env.NUXT_PUBLIC_PRESALE_PROGRAM_ID = originalEnv.PRESALE_PROGRAM_ID
+  process.env.NUXT_PUBLIC_PRESALE_END_DATE = originalEnv.PRESALE_END_DATE
 }
 
 // Run the setup

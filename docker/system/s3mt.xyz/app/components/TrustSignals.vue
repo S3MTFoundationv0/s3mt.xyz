@@ -14,7 +14,7 @@
           </div>
           <h4 class="text-xl font-semibold text-white">Real-World Assets</h4>
         </div>
-        <p class="text-gray-300">Unlike speculative tokens, S3MT is backed by real-world assets including sustainable Bitcoin mining operations and silver reserves.</p>
+        <p class="text-gray-300">Unlike speculative tokens, S3MT is backed by real-world assets including sustainable Bitcoin mining operations.</p>
       </div>
       
       <div class="bg-gray-800/70 rounded-xl p-5 border border-gray-700 hover:border-indigo-500/20 shadow-md transition-all duration-300 hover:transform hover:scale-[1.02]">

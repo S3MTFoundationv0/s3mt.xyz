@@ -10,8 +10,16 @@ if [ ! -s /etc/ssl/$CERTFILE_NAME ]; then
     # Ensure certbot is installed
     if ! command -v certbot >/dev/null 2>&1; then
         echo "Certbot not found. Installing certbot..."
-        apt-get update
-        apt-get install -y certbot
+        if command -v apk >/dev/null 2>&1; then
+            apk update
+            apk add --no-cache certbot
+        elif command -v apt-get >/dev/null 2>&1; then
+            apt-get update
+            apt-get install -y certbot
+        else
+            echo "No supported package manager found. Please install certbot manually."
+            exit 1
+        fi
     fi
 
     # Generate the certificate using certbot
