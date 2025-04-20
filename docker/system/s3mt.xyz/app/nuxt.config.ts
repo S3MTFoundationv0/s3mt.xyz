@@ -19,7 +19,7 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      solanaNetwork: 'https://validator.localhost', //process.env.SOLANA_NETWORK || 'devnet',
+      solanaNetwork: process.env.SOLANA_NETWORK || 'http://localhost:8899',
       presaleProgramId: process.env.PRESALE_PROGRAM_ID || '5tz5xFvHNnJViiCZ3iHdgqrTC1GfcEvnB49KoxvQpR3D',
       usdcMint: process.env.USDC_MINT || 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
       treasury: process.env.TREASURY || '675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8',
