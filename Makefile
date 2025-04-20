@@ -18,3 +18,4 @@ include make/start.mk
 include make/add-app.mk
 include make/launch.mk
 include make/update.mk
+include make/programs.mk
