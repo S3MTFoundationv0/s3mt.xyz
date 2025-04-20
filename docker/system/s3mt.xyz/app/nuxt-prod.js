@@ -46,6 +46,9 @@ const setupNuxtEnv = () => {
   process.env.NUXT_PUBLIC_SOLANA_NETWORK = originalEnv.SOLANA_NETWORK
   process.env.NUXT_PUBLIC_PRESALE_PROGRAM_ID = originalEnv.PRESALE_PROGRAM_ID
   process.env.NUXT_PUBLIC_PRESALE_END_DATE = originalEnv.PRESALE_END_DATE
+  process.env.NUXT_PUBLIC_USDC_MINT = originalEnv.USDC_MINT
+  process.env.NUXT_PUBLIC_TREASURY = originalEnv.TREASURY
+  process.env.NUXT_PUBLIC_SOLANA_RPC_URL = originalEnv.SOLANA_RPC_URL
 }
 
 // Run the setup
