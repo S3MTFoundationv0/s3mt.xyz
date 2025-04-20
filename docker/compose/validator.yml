@@ -1,0 +1,24 @@
+services:
+  validator:
+    container_name: s3mt-foundation-validator
+    image: ghcr.io/s3mtfoundation/validator:${VALIDATOR_IMAGE_TAG:-latest}
+    restart: unless-stopped
+    ports:
+      - "8899:8899"  # Expose RPC port directly
+      - "8900:8900"  # Expose WebSocket port directly
+    volumes:
+      - solana-ledger:/solana/ledger
+    networks:
+      - solana-net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.validator.rule=(Host(`validator.localhost`) || Host(`validator.s3mt.xyz`))"
+      - "traefik.http.routers.validator.entrypoints=https"
+      - "traefik.http.services.validator.loadbalancer.server.port=8899"
+      
+networks:
+  solana-net:
+    driver: bridge
+
+volumes:
+  solana-ledger:

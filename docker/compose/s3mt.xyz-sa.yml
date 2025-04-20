@@ -1,14 +1,12 @@
 include:
   - ./traefik.yml
-  - ./validator.yml
-  
+
 services:
   s3mt.xyz:
     image: ghcr.io/s3mtfoundation/s3mt.xyz:${S3MT_XYZ_IMAGE_TAG:-latest}
     container_name: s3mt.xyz
     depends_on:
       - traefik
-      - validator
     env_file:
       - ../.config/.env.secrets
       - ../.config/.env.shared
