@@ -82,7 +82,6 @@
 </template>
 
 <script setup>
-import { ref, computed, defineProps, defineEmits } from 'vue';
 import { WalletMultiButton } from 'solana-wallets-vue';
 import Logo from './Logo.vue';
 

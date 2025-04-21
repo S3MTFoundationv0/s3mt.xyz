@@ -21,12 +21,9 @@
       
       <!-- Purchase Form -->
       <div class="mt-16 max-w-lg mx-auto">
-        <PurchaseForm 
-          :connected="connected"
-          :loading="loading"
-          :conversion-rate="CONVERSION_RATE"
-          @purchase="handlePurchase"
-        />
+        <ClientOnly>
+          <PurchaseFormStub />
+        </ClientOnly>
       </div>
     </div>
     
@@ -57,16 +54,8 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { useWallet } from 'solana-wallets-vue'
-import PresaleHeader from '~/components/PresaleHeader.vue'
-import PresaleCountdown from '~/components/PresaleCountdown.vue'
-import PresaleStats from '~/components/PresaleStats.vue'
-import PurchaseForm from '~/components/PurchaseForm.vue'
-import TrustSignals from '~/components/TrustSignals.vue'
-
-useSWV()
-const { connected, publicKey, sendTransaction } = useWallet()
+const connected = ref(false)
+const publicKey = ref(null)
 const loading = ref(false)
 
 // Get presale end date from runtime config
