@@ -126,7 +126,7 @@
             </svg>
           </template>
           
-          <p class="mb-4 text-lg leading-relaxed">S3MT is fundamentally designed as a trustworthy financial instrument backed by real-world assets, distinct from speculative meme coins. Initial asset management is handled by our registered entity in the BVI (BolsaDx Holding Ltd.). As the ecosystem matures and assets grow, governance will transition to a DAO. We plan to implement a governance model inspired by established projects like Helium (HNT), enabling S3MT token holders to stake their tokens and vote on proposals, operational decisions, and the future direction of the asset portfolio.</p>
+          <p class="mb-4 text-lg leading-relaxed">S3MT is fundamentally designed as a trustworthy financial instrument backed by real-world assets, distinct from speculative meme coins. As the ecosystem matures and assets grow, governance will transition to a DAO. We plan to implement a governance model inspired by established projects like Helium (HNT), enabling S3MT token holders to stake their tokens and vote on proposals, operational decisions, and the future direction of the asset portfolio.</p>
         </WhitepaperSection>
         
         <SectionDivider />
@@ -138,7 +138,7 @@
             </svg>
           </template>
           
-          <p class="mb-4 text-lg leading-relaxed">Complementary to the asset-backed token, S3MT plans to launch stablecoins pegged to Latin American currencies (e.g., Mexican Peso, USD-equivalent Pesos). This initiative aims to facilitate low-cost, efficient cross-border payments and enhance financial accessibility within the region. Profits from related exchange activities (e.g., BolsaDx) will also contribute to the S3MT yield pool.</p>
+          <p class="mb-4 text-lg leading-relaxed">Complementary to the asset-backed token, S3MT plans to launch stablecoins pegged to Latin American currencies (e.g., Mexican Peso, USD-equivalent Pesos). This initiative aims to facilitate low-cost, efficient cross-border payments and enhance financial accessibility within the region. Profits from related exchange activities will also contribute to the S3MT yield pool.</p>
         </WhitepaperSection>
         
         <SectionDivider />
