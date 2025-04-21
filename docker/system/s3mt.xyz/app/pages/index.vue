@@ -37,20 +37,7 @@
       </div>
     </div>
   </section>
-
-  <!-- Featured Partner Section -->
-  <section class="py-16 bg-base-300">
-    <div class="container mx-auto px-4 text-center">
-      <h2 class="text-3xl font-bold mb-8 text-primary">Featured Partner</h2>
-      <div class="flex justify-center items-center">
-        <a href="https://ocean.xyz" target="_blank" rel="noopener noreferrer" 
-           class="flex flex-col items-center p-6 bg-base-100 rounded-lg shadow-lg hover:shadow-primary/50 transition-shadow duration-300">
-           <img src="/assets/images/s3mt-partners-ocean-logo.png" alt="Ocean Protocol Logo" class="h-20 mb-4 filter brightness-0 invert">
-           <span class="text-lg font-semibold text-white/90">Ocean</span>
-        </a>
-      </div>
-    </div>
-  </section>
+  
 </template>
 
 
