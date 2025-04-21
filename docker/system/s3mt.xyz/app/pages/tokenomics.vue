@@ -1,12 +1,12 @@
 <template>
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 animate__animated animate__fadeIn">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 overflow-hidden">
     <!-- Optional Header if needed -->
     <!-- <WhitepaperHeader /> -->
-    <h1 class="text-4xl md:text-5xl font-bold text-center mb-16 text-white">S3MT Tokenomics</h1>
+    <h1 class="text-4xl md:text-5xl font-bold text-center mb-16 text-white animate__animated animate__fadeInDown">S3MT Tokenomics</h1>
 
     <div class="grid gap-10 md:grid-cols-2">
-      <!-- Distribution Card - Removed Hover Effects -->
-      <div class="card bg-neutral text-neutral-content shadow-xl border border-neutral/40 rounded-xl transition-all duration-300 ease-in-out active:scale-[0.98] active:shadow-inner cursor-pointer">
+      <!-- Distribution Card - Added animate-on-scroll and specific class -->
+      <div class="card bg-neutral text-neutral-content shadow-xl border border-neutral/40 rounded-xl transition-all duration-300 ease-in-out active:scale-[0.98] active:shadow-inner cursor-pointer animate-on-scroll distribution-card">
         <div class="card-body p-8">
           <h2 class="card-title text-3xl font-semibold text-secondary mb-6">Distribution</h2>
           <p class="mb-8 text-lg text-neutral-content/80 leading-relaxed">
@@ -25,8 +25,8 @@
         </div>
       </div>
 
-      <!-- Token Utility Card - Removed Hover Effects -->
-      <div class="card bg-neutral text-neutral-content shadow-xl border border-neutral/40 rounded-xl transition-all duration-300 ease-in-out active:scale-[0.98] active:shadow-inner cursor-pointer">
+      <!-- Token Utility Card - Added animate-on-scroll -->
+      <div class="card bg-neutral text-neutral-content shadow-xl border border-neutral/40 rounded-xl transition-all duration-300 ease-in-out active:scale-[0.98] active:shadow-inner cursor-pointer animate-on-scroll">
         <div class="card-body p-8 space-y-6">
           <h2 class="card-title text-3xl font-semibold text-secondary">Token Utility</h2>
           <ul class="list-disc pl-6 space-y-3 text-lg text-neutral-content/80">
@@ -47,8 +47,8 @@
       </div>
     </div>
 
-    <!-- New Section for Post-Launch Minting & Distribution -->
-    <div class="mt-16 card bg-neutral text-neutral-content shadow-xl border border-neutral/40 rounded-xl transition-all duration-300 ease-in-out active:scale-[0.98] active:shadow-inner">
+    <!-- New Section for Post-Launch Minting & Distribution - Added animate-on-scroll -->
+    <div class="mt-16 card bg-neutral text-neutral-content shadow-xl border border-neutral/40 rounded-xl transition-all duration-300 ease-in-out active:scale-[0.98] active:shadow-inner animate-on-scroll">
       <div class="card-body p-8">
         <h2 class="card-title text-3xl font-semibold text-secondary mb-6">Post-Launch Minting & Distribution</h2>
         <p class="mb-4 text-lg text-neutral-content/80 leading-relaxed">
@@ -83,15 +83,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import ThemedProgressBar from '~/components/ui/ThemedProgressBar.vue';
 // Removed unused component imports
 
-// Define distribution data within script setup
+// Define TOTAL_SUPPLY and distribution data
 const TOTAL_SUPPLY = 1000000000;
-
 const distribution = ref([
-  { label: "Token Holder Allocation", value: 800000000 }, // 432M Presale + 368M Launch/Post-Launch
+  { label: "Token Holder Allocation", value: 800000000 },
   { label: "DAO Operations", value: 70000000 },
   { label: "Development Team", value: 30000000 },
   { label: "Marketing", value: 20000000 },
@@ -99,24 +98,33 @@ const distribution = ref([
   { label: "Founder Rewards", value: 30000000 },
 ]);
 
-// Reactive ref for animated progress values
+// Reactive refs for animation
 const animatedDistribution = ref(
   distribution.value.map(item => ({ ...item, animatedValue: 0 }))
 );
+const distributionCardRef = ref(null); // Ref for the distribution card element
+const hasAnimated = ref(false); // Flag to ensure animation runs only once
 
-// Animation function
-const animateProgressBars = () => {
-  const duration = 1000; // Animation duration in ms
+// --- Animation Logic ---
+
+// Number count-up animation function
+const animateDistributionNumbers = () => {
+  if (hasAnimated.value) return; // Don't re-animate
+  hasAnimated.value = true;
+
+  const duration = 1500; // Longer duration for effect
   const startTime = performance.now();
 
   const runAnimation = (currentTime) => {
     const elapsedTime = currentTime - startTime;
     const progress = Math.min(elapsedTime / duration, 1); // Normalize progress (0 to 1)
 
+    // Apply ease-out quadratic easing function: progress * (2 - progress)
+    const easedProgress = progress * (2 - progress);
+
     animatedDistribution.value.forEach((item, index) => {
       const targetValue = distribution.value[index].value;
-      // Use Math.floor for smoother animation towards the large number
-      item.animatedValue = Math.floor(targetValue * progress);
+      item.animatedValue = Math.floor(targetValue * easedProgress);
     });
 
     if (progress < 1) {
@@ -132,34 +140,98 @@ const animateProgressBars = () => {
   requestAnimationFrame(runAnimation);
 };
 
-// Run animation when component is mounted
+// --- Intersection Observer Setup ---
+let observer = null;
+
 onMounted(() => {
-  animateProgressBars();
+  const options = {
+    root: null, // viewport
+    threshold: 0.2, // Trigger when 20% of the element is visible
+  };
+
+  observer = new IntersectionObserver((entries, observerInstance) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        // Animate numbers when distribution card is visible
+        // Check target using classList as ref might not be fully resolved or could be a component
+        if (entry.target.classList.contains('distribution-card') && !hasAnimated.value) {
+           animateDistributionNumbers();
+        }
+        // Add 'is-visible' class for general card animations
+        entry.target.classList.add('is-visible');
+        // Optional: Unobserve after animation if not needed anymore
+        // observerInstance.unobserve(entry.target);
+      } else {
+         // Optional: remove class if you want animation to reverse on scroll out
+         // Keep elements visible once they appear for this use case
+         // entry.target.classList.remove('is-visible');
+      }
+    });
+  }, options);
+
+  // Observe all elements with the 'animate-on-scroll' class
+  const elementsToAnimate = document.querySelectorAll('.animate-on-scroll');
+  elementsToAnimate.forEach(el => {
+     if (observer) observer.observe(el);
+  });
+
+  // Clean up distributionCardRef - no longer needed if selecting by class
+  // const distCardElement = document.querySelector('.distribution-card');
+  // if (distCardElement && observer) {
+  //   distributionCardRef.value = { $el: distCardElement }; // Simulate component ref structure
+  //   observer.observe(distCardElement);
+  // }
+
 });
 
-// Helper function to format large numbers with commas
+onBeforeUnmount(() => {
+  if (observer) {
+    // Ensure elements exist before trying to unobserve if needed
+    const elementsToAnimate = document.querySelectorAll('.animate-on-scroll');
+    elementsToAnimate.forEach(el => {
+       if (observer) observer.unobserve(el);
+    });
+    observer.disconnect();
+  }
+});
+
+
+// --- Helper Functions ---
 const formatNumber = (num) => {
   return Math.round(num).toLocaleString('en-US');
 };
 
-// Helper function to calculate percentage for the progress bar
 const calculatePercentage = (value) => {
+  // Prevent division by zero if TOTAL_SUPPLY is somehow 0
+  if (TOTAL_SUPPLY === 0) return 0;
   return (value / TOTAL_SUPPLY) * 100;
 };
 
 // Define page meta using useHead
 useHead({
-  title: 'S3MT Tokenomics',
+  title: 'S3MT Tokenomics - Interactive',
   meta: [
-    { name: 'description', content: 'Learn about the S3MT token distribution, utility, and deflationary mechanisms.' }
+    { name: 'description', content: 'Explore the S3MT token distribution, utility, and minting process with interactive elements.' }
   ],
 })
 </script>
 
 <style scoped>
-@import 'animate.css';
+@import 'animate.css'; /* Keep for title animation */
 
-/* Remove styles related to native progress element */
+/* Styles for scroll-triggered animations */
+.animate-on-scroll {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.animate-on-scroll.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Remove default progress styles if they conflict or are unneeded */
 /*
 .progress.h-4 {
     height: 1rem; 
