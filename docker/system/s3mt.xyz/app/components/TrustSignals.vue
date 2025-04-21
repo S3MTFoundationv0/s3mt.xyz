@@ -42,12 +42,7 @@
       </div>
     </div>
     
-    <div class="flex flex-wrap justify-center items-center gap-8 mt-12 px-4">
-      <div class="text-center">
-        <p class="text-sm text-gray-400 mb-2">Registered Entity</p>
-        <div class="text-lg font-medium text-white">BolsaDx Holding Ltd. (BVI)</div>
-      </div>
-      
+    <div class="flex flex-wrap justify-center items-center gap-8 mt-12 px-4">      
       <div class="h-12 border-r border-gray-700"></div>
       
       <div class="text-center">
