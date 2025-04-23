@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { useWallet } from 'solana-wallets-vue'
-import { Connection, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js'
-import { AnchorProvider, Program, BN } from '@coral-xyz/anchor' // Import Anchor items
+import { Connection, PublicKey, LAMPORTS_PER_SOL, type TransactionInstruction, type CompiledInstruction, Message, VersionedMessage, type AccountMeta } from '@solana/web3.js'
+import { AnchorProvider, Program, BN, type Idl } from '@coral-xyz/anchor' // Import Anchor items
 import presaleIdl from '~/programs/s3mt_presale.idl.json' // Import the IDL
+import { Buffer } from 'buffer' // Import Buffer
+import * as bs58 from 'bs58' // Import bs58
 
 useSWV()
 
@@ -43,7 +45,8 @@ const provider = new AnchorProvider(connection, {} as any, { commitment: 'confir
 const fixIdlPublicKeys = (idl: any) => {
   return { ...idl, metadata: { ...(idl.metadata || {}), address: presaleProgramId.toString() } };
 };
-const program = new Program(fixIdlPublicKeys(presaleIdl as any), provider);
+// Cast IDL
+const program = new Program(fixIdlPublicKeys(presaleIdl as any) as Idl, provider);
 // --- End Anchor Setup ---
 
 
@@ -64,10 +67,9 @@ async function fetchAndParseTransactions() {
     const signatures = signaturesInfo.map(sigInfo => sigInfo.signature)
 
     // 2. Fetch Full Transaction Details
-    // Note: getTransactions can sometimes return null for slots that were skipped
     const fetchedTxs = await connection.getTransactions(signatures, {
       commitment: 'finalized',
-      maxSupportedTransactionVersion: 0 // Specify version if needed, 0 for legacy/v0
+      maxSupportedTransactionVersion: 0 // Or specify highest supported version
     })
 
     const parsedTxs: ParsedTransaction[] = []
@@ -75,16 +77,16 @@ async function fetchAndParseTransactions() {
     // 3. Parse Each Transaction
     for (let i = 0; i < fetchedTxs.length; i++) {
       const tx = fetchedTxs[i]
-      const sigInfo = signaturesInfo[i] // Get corresponding sigInfo for blockTime
+      const sigInfo = signaturesInfo[i]
 
       if (!tx || !tx.transaction || !tx.meta) {
         console.warn(`Skipping null transaction for signature: ${signatures[i]}`)
-        continue; // Skip if transaction data is null
+        continue;
       }
 
       let parsedData: ParsedTransaction = {
         signature: signatures[i],
-        blockTime: sigInfo?.blockTime, // Use blockTime from sigInfo
+        blockTime: sigInfo?.blockTime,
         buyer: null,
         s3mtAmount: 'N/A',
         cost: 'N/A',
@@ -93,44 +95,97 @@ async function fetchAndParseTransactions() {
       }
 
       try {
-        // Find the instruction related to our program
-        const ix = tx.transaction.message.instructions.find(ix =>
-          tx.transaction.message.accountKeys[ix.programIdIndex].equals(presaleProgramId)
+        const message = tx.transaction.message;
+        let accountKeys: PublicKey[];
+        // Use a common structure for processing instructions
+        let processedInstructions: { programIdIndex: number; accounts: number[]; data: string | Uint8Array | Buffer }[] = [];
+
+        // Check for VersionedMessage using property existence
+        if ('addressTableLookups' in message) {
+           // Versioned Message (potentially V0)
+           const msgV0 = message as VersionedMessage; // Cast for type safety
+           accountKeys = msgV0.staticAccountKeys.concat(msgV0.addressTableLookups ? await getKeysFromLookups(msgV0.addressTableLookups) : []);
+           // Map CompiledInstruction to our common structure
+           processedInstructions = msgV0.compiledInstructions.map(ix => ({
+             programIdIndex: ix.programIdIndex,
+             accounts: ix.accountKeyIndexes, // Use accountKeyIndexes
+             data: ix.data // data is typically Uint8Array here
+           }));
+        } else {
+           // Legacy Message
+           const msgLegacy = message as Message; // Cast for type safety
+           accountKeys = msgLegacy.accountKeys;
+           // Map TransactionInstruction to our common structure
+           processedInstructions = msgLegacy.instructions.map(ix => ({
+             programIdIndex: ix.programIdIndex,
+             // Map pubkeys back to indices in the legacy accountKeys array
+             accounts: ix.accounts.map(accMeta => accountKeys.findIndex(key => key.equals((accMeta as AccountMeta).pubkey))), // Cast accMeta
+             data: ix.data // data is Buffer here
+           }));
+        }
+
+        // Find the instruction related to our program using the common structure
+        const ix = processedInstructions.find(ix =>
+          accountKeys[ix.programIdIndex]?.equals(presaleProgramId) // Add optional chaining
         );
 
-        if (ix && 'data' in ix) {
-          const decodedIx = program.coder.instruction.decode(ix.data, 'base58');
+        if (ix && ix.data) { // Check if ix and ix.data exist
+          let dataBuffer: Buffer;
+          // Ensure data is a Buffer for the decoder
+          if (ix.data instanceof Uint8Array) {
+              dataBuffer = Buffer.from(ix.data);
+          } else if (typeof ix.data === 'string') {
+              // Use bs58 to decode base58 string
+              try {
+                  dataBuffer = Buffer.from(bs58.decode(ix.data));
+              } catch (e) {
+                  console.warn(`Failed to decode base58 data for signature: ${parsedData.signature}`, ix.data, e);
+                  continue;
+              }
+          } else if (Buffer.isBuffer(ix.data)) {
+               dataBuffer = ix.data;
+          }
+           else {
+              console.warn(`Instruction data has unexpected type for signature: ${parsedData.signature}`, ix.data);
+              continue; // Skip if data type is wrong
+          }
+
+          // Use bracket notation for decode
+          const decodedIx = program.coder.instruction['decode'](dataBuffer);
 
           if (decodedIx) {
-            const accounts = tx.transaction.message.accountKeys;
-            // Buyer is typically the first account passed to purchase_* methods
-            const buyerPk = accounts[ix.accounts[0]]; // Assuming buyer is index 0
-            parsedData.buyer = buyerPk.toBase58();
-
-            // Check if this transaction belongs to the connected user
-            if (publicKey.value && buyerPk.equals(publicKey.value)) {
-              parsedData.isUserTransaction = true;
+            // Use the account indices from our common structure
+            const buyerAccountIndex = ix.accounts[0]; // Assuming buyer is index 0
+            const buyerPk = accountKeys[buyerAccountIndex];
+            if (buyerPk) {
+              parsedData.buyer = buyerPk.toBase58();
+              // Check if this transaction belongs to the connected user
+              if (publicKey.value && buyerPk.equals(publicKey.value)) {
+                parsedData.isUserTransaction = true;
+              }
+            } else {
+               console.warn(`Could not resolve buyer public key for index ${buyerAccountIndex} in signature: ${parsedData.signature}`);
             }
 
             // Extract data based on instruction name
             if (decodedIx.name === 'purchaseUsdc') {
-              const s3mtAmount = decodedIx.data.s3mtAmount as BN;
-              const usdcAmount = decodedIx.data.usdcAmount as BN; // Amount in smallest unit (1e6)
+              const s3mtAmount = decodedIx.data.solAmount
+              const usdcAmount = decodedIx.data.usdcAmount
               parsedData.s3mtAmount = s3mtAmount.toString();
-              parsedData.cost = (usdcAmount.toNumber() / 1e6).toFixed(6); // Format USDC
+              parsedData.cost = (usdcAmount.toNumber() / 1e6).toFixed(6);
               parsedData.currency = 'USDC';
             } else if (decodedIx.name === 'purchaseSol') {
-              const s3mtAmount = decodedIx.data.s3mtAmount as BN;
-              const lamports = decodedIx.data.lamports as BN; // Amount in lamports (1e9)
+              const s3mtAmount = decodedIx.data.s3MtAmount
+              const solAmount = decodedIx.data.solAmount
               parsedData.s3mtAmount = s3mtAmount.toString();
-              parsedData.cost = (lamports.toNumber() / LAMPORTS_PER_SOL).toFixed(9); // Format SOL
+              parsedData.cost = (solAmount.toNumber() / LAMPORTS_PER_SOL).toFixed(9);
               parsedData.currency = 'SOL';
             }
           } else {
-             console.warn(`Could not decode instruction for signature: ${parsedData.signature}`);
+             console.warn(`Could not decode instruction data buffer for signature: ${parsedData.signature}`);
           }
         } else {
-           console.warn(`No instruction found for program ${presaleProgramId} in signature: ${parsedData.signature}`);
+           console.warn(`No instruction found for program ${presaleProgramId} or ix.data is missing in signature: ${parsedData.signature}`);
         }
       } catch (parseError) {
         console.error(`Error parsing transaction ${parsedData.signature}:`, parseError)
@@ -147,6 +202,31 @@ async function fetchAndParseTransactions() {
   } finally {
     loading.value = false
   }
+}
+
+// Helper function to resolve Address Lookup Table keys (simplified, might need more robust implementation)
+async function getKeysFromLookups(lookups: any[]): Promise<PublicKey[]> {
+    let keys: PublicKey[] = [];
+    for (const lookup of lookups) {
+        try {
+            // Safety check before accessing accountKey
+            if (!lookup || !lookup.accountKey) {
+                console.warn("Invalid lookup object found:", lookup);
+                continue;
+            }
+            const tableAccount = await connection.getAddressLookupTable(lookup.accountKey);
+            if (tableAccount && tableAccount.value) {
+                const lookupKeys = tableAccount.value.state.addresses;
+                keys = keys.concat(lookupKeys);
+            } else {
+              // Log the key safely
+              console.warn("Could not fetch or find addresses in lookup table:", lookup.accountKey.toBase58());
+            }
+        } catch (e) {
+            console.error(`Error fetching lookup table for key ${lookup?.accountKey?.toBase58()}:`, e);
+        }
+    }
+    return keys;
 }
 
 // Format timestamp
