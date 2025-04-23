@@ -1,11 +1,12 @@
 <script setup lang="ts">
+import { PythSolanaReceiver } from "@pythnetwork/pyth-solana-receiver"
 import { useWallet, useAnchorWallet } from 'solana-wallets-vue'
 import { Connection, PublicKey, SystemProgram, SYSVAR_CLOCK_PUBKEY, LAMPORTS_PER_SOL } from '@solana/web3.js'
 import { AnchorProvider, Program, BN } from '@coral-xyz/anchor'
 import { PhantomWalletAdapter, SolflareWalletAdapter } from '@solana/wallet-adapter-wallets'
 import { getAssociatedTokenAddress, TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import presaleIdl from '~/programs/s3mt_presale.idl.json'
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 
 useSWV()
 
@@ -16,11 +17,47 @@ useHead({
 
 console.log(presaleIdl)
 
+// Price oracle data (would come from an actual oracle API in production)
+const solPrice = ref(169.42); // Current SOL price in USD
+const isFetchingPrice = ref(false);
+
 // Constants & reactive state
-const PRICE = 0.10
+const PRICE = 0.10 // Price in USD
 const currency = ref('USDC')
 const amount = ref(0)
-const totalCost = computed(() => PRICE * amount.value)
+
+// Computed props for currency-specific calculations
+const totalCostInUsd = computed(() => PRICE * amount.value)
+
+// Dynamic total based on selected currency
+const totalCost = computed(() => {
+  if (currency.value === 'USDC') {
+    return totalCostInUsd.value;
+  } else {
+    // Convert USD to SOL
+    return totalCostInUsd.value / solPrice.value;
+  }
+})
+
+// Format display values based on selected currency
+const formattedTotalCost = computed(() => {
+  if (currency.value === 'USDC') {
+    return '$' + totalCost.value.toFixed(2);
+  } else {
+    return totalCost.value.toFixed(5) + ' SOL';
+  }
+})
+
+// Format for individual token price display
+const formattedTokenPrice = computed(() => {
+  if (currency.value === 'USDC') {
+    return '$' + PRICE.toFixed(2);
+  } else {
+    const priceInSol = PRICE / solPrice.value;
+    return priceInSol.toFixed(8) + ' SOL';
+  }
+})
+
 const isValid = computed(() => amount.value > 0)
 
 // Wallet & UI state
@@ -148,14 +185,62 @@ function timeAgo(date: Date): string {
   return Math.floor(seconds) + "s ago";
 }
 
+// Mock function to fetch SOL price from an oracle
+async function fetchSolPrice() {
+  try {
+    isFetchingPrice.value = true;
+    
+    // In production, replace this with an actual API call to a price oracle
+    // For example:
+    // const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd');
+    // const data = await response.json();
+    // solPrice.value = data.solana.usd;
+    
+    // For development, simulate API delay and randomly fluctuate the price slightly
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Random price fluctuation (±2%) to simulate market movement
+    const fluctuation = 1 + (Math.random() * 0.04 - 0.02);
+    solPrice.value = 169.42 * fluctuation;
+    
+    console.log(`Updated SOL price: $${solPrice.value.toFixed(2)}`);
+  } catch (error) {
+    console.error('Failed to fetch SOL price:', error);
+    // Fallback to a default price if fetch fails
+    solPrice.value = 169.42;
+  } finally {
+    isFetchingPrice.value = false;
+  }
+}
+
+// Watch for currency changes to refetch price when switching to SOL
+watch(currency, (newCurrency) => {
+  if (newCurrency === 'SOL') {
+    fetchSolPrice();
+  }
+});
+
 // Lifecycle hooks
 onMounted(() => {
   updateCountdown()
   countdownTimer = setInterval(updateCountdown, 1000)
-})
-
-onUnmounted(() => {
-  if (countdownTimer) clearInterval(countdownTimer)
+  
+  // Fetch SOL price initially if currency is SOL
+  if (currency.value === 'SOL') {
+    fetchSolPrice()
+  }
+  
+  // For development - periodically refresh SOL price to simulate market movement
+  const priceRefreshInterval = setInterval(() => {
+    if (currency.value === 'SOL') {
+      fetchSolPrice()
+    }
+  }, 30000) // Every 30 seconds
+  
+  // Clean up interval on component unmount
+  onUnmounted(() => {
+    clearInterval(priceRefreshInterval)
+  })
 })
 
 // Purchase handler wiring to Anchor program
@@ -213,9 +298,10 @@ async function onPurchase() {
         .rpc()
       transactionSignature.value = txSigUsdc
     } else {
-      // Compute lamports for SOL purchase
+      // For SOL: calculate using SOL price instead of fixed USD conversion
+      const solCost = totalCost.value;
       const lamportsBn = new BN(
-        Math.round(amount.value * PRICE * LAMPORTS_PER_SOL)
+        Math.round(solCost * LAMPORTS_PER_SOL)
       )
 
       // Call purchase_sol
@@ -284,10 +370,8 @@ async function onPurchase() {
         <div class="relative z-10">
           <h3 class="text-sm font-medium text-gray-400 mb-1">Token Price</h3>
           <div class="flex items-center">
-            <span class="text-2xl font-bold text-white">$0.10</span>
-            <span class="ml-2 text-xs bg-green-900/50 text-green-400 px-2 py-1 rounded">Presale Price</span>
+            <span class="text-2xl font-bold text-white">{{ formattedTokenPrice }}</span>
           </div>
-          <p class="text-gray-400 text-xs mt-2">Next phase price: <span class="text-white">$0.15</span></p>
           <p class="text-green-400 text-xs mt-1">50% discount from public sale</p>
         </div>
       </div>
@@ -330,7 +414,7 @@ async function onPurchase() {
         <div class="p-5 border-b border-gray-700/70 bg-gray-800/90 flex justify-between items-center">
           <div>
             <h3 class="text-xl font-semibold text-white">Purchase S3MT Tokens</h3>
-            <p class="text-gray-400 text-sm">Current Price: $0.10 per token</p>
+            <p class="text-gray-400 text-sm">Current Price: {{ formattedTokenPrice }}</p>
           </div>
           <div v-if="connected" class="text-sm text-green-400 flex items-center">
             <span class="h-2 w-2 rounded-full bg-green-400 mr-2"></span>
@@ -344,7 +428,7 @@ async function onPurchase() {
         
         <!-- Form Body with Enhanced Controls -->
         <div class="p-6 space-y-6">
-          <!-- Currency Selection with Icons -->
+          <!-- Currency Selection with Icons and Price Info -->
           <div>
             <label for="currency" class="block text-sm font-medium text-gray-300 mb-2">Select Currency</label>
             <div class="grid grid-cols-2 gap-4">
@@ -358,12 +442,15 @@ async function onPurchase() {
                 ]"
               >
                 <span class="text-blue-300 text-lg mr-2">$</span>
-                <span :class="currency === 'USDC' ? 'text-white' : 'text-gray-400'">USDC</span>
+                <div class="flex flex-col">
+                  <span :class="currency === 'USDC' ? 'text-white' : 'text-gray-400'">USDC</span>
+                  <span class="text-xs text-gray-500">1:1 with USD</span>
+                </div>
               </div>
               <div 
                 @click="currency = 'SOL'"
                 :class="[
-                  'flex items-center justify-center cursor-pointer p-3 rounded-lg border transition-all',
+                  'flex items-center justify-center cursor-pointer p-3 rounded-lg border transition-all relative',
                   currency === 'SOL' 
                     ? 'bg-purple-900/40 border-purple-500/50 shadow-md shadow-purple-500/10' 
                     : 'bg-gray-800/70 border-gray-700 hover:bg-gray-700/50'
@@ -374,7 +461,17 @@ async function onPurchase() {
                   <path d="M93.94 109.6H13.72a2.62 2.62 0 0 1-1.85-4.47l19.22-19.22a2.62 2.62 0 0 1 1.85-.76h80.22a2.62 2.62 0 0 1 1.85 4.47L95.79 108.83a2.62 2.62 0 0 1-1.85.77Z" fill="currentColor"/>
                   <path d="M114.6 76.5H34.38a2.62 2.62 0 0 1-1.85-4.47l19.22-19.22a2.62 2.62 0 0 1 1.85-.77H114.6a2.62 2.62 0 0 1 1.85 4.47L97.23 75.73a2.62 2.62 0 0 1-1.85.77Z" fill="currentColor"/>
                 </svg>
-                <span :class="currency === 'SOL' ? 'text-white' : 'text-gray-400'">SOL</span>
+                <div class="flex flex-col">
+                  <span :class="currency === 'SOL' ? 'text-white' : 'text-gray-400'">SOL</span>
+                  <span class="text-xs text-gray-500">${{ solPrice.toFixed(2) }} per SOL</span>
+                </div>
+                <!-- Loading indicator for price fetching -->
+                <div v-if="isFetchingPrice && currency === 'SOL'" class="absolute top-1 right-1">
+                  <svg class="animate-spin h-3 w-3 text-purple-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                </div>
               </div>
             </div>
           </div>
@@ -409,11 +506,11 @@ async function onPurchase() {
             </div>
           </div>
 
-          <!-- Summary Card -->
+          <!-- Summary Card with Dynamic Currency Display -->
           <div class="bg-gray-800/70 rounded-lg p-4 border border-gray-700/50">
             <div class="flex justify-between items-center mb-2">
               <span class="text-gray-400">Price per token:</span>
-              <span class="text-white font-medium">$0.10</span>
+              <span class="text-white font-medium">{{ formattedTokenPrice }}</span>
             </div>
             <div class="flex justify-between items-center mb-2">
               <span class="text-gray-400">Total tokens:</span>
@@ -422,7 +519,10 @@ async function onPurchase() {
             <div class="h-px bg-gray-700 my-3"></div>
             <div class="flex justify-between items-center">
               <span class="text-gray-300 font-medium">Total Cost:</span>
-              <span class="text-xl font-bold text-white">{{ formatCurrency(totalCost) }}</span>
+              <div class="flex items-center">
+                <span class="text-xl font-bold text-white">{{ formattedTotalCost }}</span>
+                <span v-if="currency === 'SOL'" class="ml-2 text-xs text-gray-400">(≈ ${{ totalCostInUsd.toFixed(2) }})</span>
+              </div>
             </div>
           </div>
 
