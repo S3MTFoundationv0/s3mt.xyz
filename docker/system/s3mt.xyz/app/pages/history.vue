@@ -33,7 +33,7 @@ const fetchedTransactions = ref<ParsedTransaction[]>([])
 
 // Create computed property for display
 const displayTransactions = computed(() => {
-  return fetchedTransactions.value.map(tx => ({
+  return fetchedTransactions.value.map((tx: ParsedTransaction) => ({
     ...tx,
     isUserTransaction: !!(publicKey.value && tx.buyer && new PublicKey(tx.buyer).equals(publicKey.value))
   }));
@@ -166,8 +166,8 @@ async function fetchAndParseTransactions() {
            // Map TransactionInstruction to our common structure
            processedInstructions = msgLegacy.instructions.map(ix => ({
              programIdIndex: ix.programIdIndex,
-             // Map pubkeys back to indices in the legacy accountKeys array
-             accounts: ix.accounts.map(accMeta => accountKeys.findIndex(key => key.equals((accMeta as AccountMeta).pubkey))), // Cast accMeta
+             // Map pubkeys back to indices in the legacy accountKeys array - Fix cast
+             accounts: ix.accounts.map(accMeta => accountKeys.findIndex(key => key.equals((accMeta as unknown as AccountMeta).pubkey))),
              data: ix.data // data is Buffer here
            }));
         }
@@ -198,8 +198,8 @@ async function fetchAndParseTransactions() {
               continue; // Skip if data type is wrong
           }
 
-          // Use bracket notation for decode
-          const decodedIx = program.coder.instruction['decode'](dataBuffer);
+          // Use bracket notation for decode - Cast coder to any to suppress linter
+          const decodedIx = (program.coder.instruction as any).decode(dataBuffer);
 
           if (decodedIx) {
             // Use the account indices from our common structure
@@ -217,15 +217,16 @@ async function fetchAndParseTransactions() {
 
             // Extract data based on instruction name
             if (decodedIx.name === 'purchaseUsdc') {
-              const s3mtAmount = decodedIx.data.solAmount
-              const usdcAmount = decodedIx.data.usdcAmount
-              parsedData.s3mtAmount = s3mtAmount.toString();
+              // Standardize field name to s3MtAmount
+              const s3MtAmount = decodedIx.data.s3MtAmount as BN;
+              const usdcAmount = decodedIx.data.usdcAmount as BN;
+              parsedData.s3mtAmount = s3MtAmount.toString();
               parsedData.cost = (usdcAmount.toNumber() / 1e6).toFixed(6);
               parsedData.currency = 'USDC';
             } else if (decodedIx.name === 'purchaseSol') {
-              const s3mtAmount = decodedIx.data.s3MtAmount
-              const solAmount = decodedIx.data.solAmount
-              parsedData.s3mtAmount = s3mtAmount.toString();
+              const s3MtAmount = decodedIx.data.s3MtAmount as BN;
+              const solAmount = decodedIx.data.solAmount as BN;
+              parsedData.s3mtAmount = s3MtAmount.toString();
               parsedData.cost = (solAmount.toNumber() / LAMPORTS_PER_SOL).toFixed(9);
               parsedData.currency = 'SOL';
             }
