@@ -29,7 +29,15 @@ interface ParsedTransaction {
 const { connected, publicKey } = useWallet()
 const loading = ref(false)
 const errorMsg = ref('')
-const transactions = ref<ParsedTransaction[]>([]) // Use the interface
+const fetchedTransactions = ref<ParsedTransaction[]>([])
+
+// Create computed property for display
+const displayTransactions = computed(() => {
+  return fetchedTransactions.value.map(tx => ({
+    ...tx,
+    isUserTransaction: !!(publicKey.value && tx.buyer && new PublicKey(tx.buyer).equals(publicKey.value))
+  }));
+});
 
 // Environment variables & Connection
 const config = useRuntimeConfig()
@@ -53,7 +61,7 @@ const program = new Program(fixIdlPublicKeys(presaleIdl as any) as Idl, provider
 async function fetchAndParseTransactions() {
   loading.value = true
   errorMsg.value = ''
-  transactions.value = []
+  fetchedTransactions.value = []
   try {
     // 1. Fetch Signatures
     const signaturesInfo = await connection.getSignaturesForAddress(presaleProgramId, { limit: 100 })
@@ -194,7 +202,7 @@ async function fetchAndParseTransactions() {
       parsedTxs.push(parsedData)
     } // End loop
 
-    transactions.value = parsedTxs
+    fetchedTransactions.value = parsedTxs
 
   } catch (err) {
     console.error('Error fetching or parsing transactions:', err)
@@ -260,7 +268,7 @@ onMounted(() => {
     <div v-else-if="errorMsg" class="text-center text-red-500 bg-red-900/30 border border-red-700 p-4 rounded-lg">
       {{ errorMsg }}
     </div>
-    <div v-else-if="transactions.length > 0" class="bg-gray-800/70 rounded-xl border border-gray-700 overflow-hidden shadow-lg">
+    <div v-else-if="displayTransactions.length > 0" class="bg-gray-800/70 rounded-xl border border-gray-700 overflow-hidden shadow-lg">
       <table class="min-w-full divide-y divide-gray-700">
         <thead class="bg-gray-700/50">
           <tr>
@@ -273,7 +281,7 @@ onMounted(() => {
         </thead>
         <tbody class="bg-gray-800 divide-y divide-gray-700">
           <tr
-            v-for="tx in transactions"
+            v-for="tx in displayTransactions"
             :key="tx.signature"
             :class="{'bg-indigo-900/40': tx.isUserTransaction, 'hover:bg-gray-700/50': true}"
             class="transition-colors duration-150"
