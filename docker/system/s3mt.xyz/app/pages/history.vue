@@ -63,29 +63,69 @@ async function fetchAndParseTransactions() {
   errorMsg.value = ''
   fetchedTransactions.value = []
   try {
-    // 1. Fetch Signatures
-    const signaturesInfo = await connection.getSignaturesForAddress(presaleProgramId, { limit: 100 })
+    // --- Paginated Signature Fetching ---
+    const allSignaturesInfo: any[] = []; // Array to hold all signature info objects
+    let oldestSignature: string | undefined = undefined;
+    const batchLimit = 100; // How many signatures to fetch per RPC call
+    console.log("Starting transaction signature fetching...");
 
-    if (!signaturesInfo || signaturesInfo.length === 0) {
+    while (true) {
+      console.log(`Fetching signatures before: ${oldestSignature || 'start'}`);
+      const signaturesInfo = await connection.getSignaturesForAddress(
+        presaleProgramId,
+        {
+          limit: batchLimit,
+          before: oldestSignature
+        },
+        'finalized' // Explicitly request finalized commitment here
+      );
+
+      if (signaturesInfo.length === 0) {
+        console.log("No more signatures found, breaking loop.");
+        break; // Exit loop if no more signatures are found
+      }
+
+      allSignaturesInfo.push(...signaturesInfo);
+      oldestSignature = signaturesInfo[signaturesInfo.length - 1].signature;
+      console.log(`Fetched ${signaturesInfo.length} signatures. Oldest is now: ${oldestSignature}`);
+
+      // Optional: Add a small delay to avoid rate limiting on public RPCs
+      // await new Promise(resolve => setTimeout(resolve, 200));
+
+      // Safety break if something goes wrong (e.g., infinite loop possibility)
+      if (allSignaturesInfo.length > 2000) { // Adjust limit as needed
+         console.warn("Reached signature fetch limit (2000), stopping pagination.");
+         break;
+      }
+    }
+    console.log(`Total signatures fetched: ${allSignaturesInfo.length}`);
+    // --- End Paginated Fetching ---
+
+    if (allSignaturesInfo.length === 0) {
       errorMsg.value = 'No transactions found for this program yet.'
       loading.value = false
       return
     }
 
-    const signatures = signaturesInfo.map(sigInfo => sigInfo.signature)
+    // Extract just the signatures string array for getTransactions
+    const signatures = allSignaturesInfo.map(sigInfo => sigInfo.signature)
 
-    // 2. Fetch Full Transaction Details
+    // 2. Fetch Full Transaction Details (Consider batching this if signature list is huge)
+    console.log(`Fetching details for ${signatures.length} transactions...`);
     const fetchedTxs = await connection.getTransactions(signatures, {
       commitment: 'finalized',
-      maxSupportedTransactionVersion: 0 // Or specify highest supported version
+      maxSupportedTransactionVersion: 0
     })
+    console.log(`Fetched details complete.`);
 
     const parsedTxs: ParsedTransaction[] = []
 
     // 3. Parse Each Transaction
+    console.log("Parsing transactions...");
     for (let i = 0; i < fetchedTxs.length; i++) {
       const tx = fetchedTxs[i]
-      const sigInfo = signaturesInfo[i]
+      // Find corresponding sigInfo using the signature for correct blockTime
+      const sigInfo = allSignaturesInfo.find(info => info.signature === signatures[i]);
 
       if (!tx || !tx.transaction || !tx.meta) {
         console.warn(`Skipping null transaction for signature: ${signatures[i]}`)
@@ -203,6 +243,7 @@ async function fetchAndParseTransactions() {
     } // End loop
 
     fetchedTransactions.value = parsedTxs
+    console.log("Parsing complete.");
 
   } catch (err) {
     console.error('Error fetching or parsing transactions:', err)
