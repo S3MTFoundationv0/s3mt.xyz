@@ -4,6 +4,8 @@ import { Connection, PublicKey, SystemProgram, SYSVAR_CLOCK_PUBKEY, LAMPORTS_PER
 import { AnchorProvider, Program, BN } from '@coral-xyz/anchor'
 import { getAssociatedTokenAddress, TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import presaleIdl from '~/programs/s3mt_presale.idl.json'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+import { useFetch } from '#app'
 
 useSWV()
 
@@ -12,9 +14,10 @@ useHead({
   meta: [{ name: 'description', content: 'Founders presale - get in early at $0.10 per unit.' }]
 })
 
+console.log(presaleIdl)
 
 // Price oracle data (would come from an actual oracle API in production)
-const solPrice = ref(169.42); // Current SOL price in USD
+const solPrice = ref<number | null>(null); // Initialize as null or a default, will be updated by API
 const isFetchingPrice = ref(false);
 
 // Constants & reactive state
@@ -185,24 +188,25 @@ function timeAgo(date: Date): string {
 async function fetchSolPrice() {
   try {
     isFetchingPrice.value = true;
-    
-    // In production, replace this with an actual API call to a price oracle
-    // For example:
-    const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd');
-    const data = await response.json();
-    solPrice.value = data.solana.usd;
-    
-    // For development, simulate API delay and randomly fluctuate the price slightly
-    // await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Random price fluctuation (±2%) to simulate market movement
-    // const fluctuation = 1 + (Math.random() * 0.04 - 0.02);
-    // solPrice.value = 169.42 * fluctuation;
-    
-    console.log(`Updated SOL price: $${solPrice.value.toFixed(2)}`);
+
+    // Use Nuxt's useFetch to call the API endpoint
+    const { data, error } = await useFetch('/api/prices/solana')
+
+    if (error.value) {
+      console.error('Failed to fetch SOL price:', error.value);
+      // Optionally fallback to a default price or show an error
+      solPrice.value = 169.42; // Fallback for now
+    } else if (data.value && data.value.success) {
+      solPrice.value = data.value.price;
+      console.log(`Updated SOL price from API: $${solPrice.value.toFixed(2)}`);
+    } else {
+      console.error('API did not return a successful price:', data.value);
+      solPrice.value = 169.42; // Fallback for now
+    }
+
   } catch (error) {
-    console.error('Failed to fetch SOL price:', error);
-    // Fallback to a default price if fetch fails
+    console.error('Error in fetchSolPrice function:', error);
+    // Fallback to a default price if fetch fails unexpectedly
     solPrice.value = 169.42;
   } finally {
     isFetchingPrice.value = false;
@@ -221,21 +225,19 @@ onMounted(() => {
   updateCountdown()
   countdownTimer = setInterval(updateCountdown, 1000)
   
-  // Fetch SOL price initially if currency is SOL
-  if (currency.value === 'SOL') {
-    fetchSolPrice()
-  }
+  // Fetch SOL price initially regardless of currency,
+  // as it's needed for display even if USDC is selected initially.
+  fetchSolPrice()
   
-  // For development - periodically refresh SOL price to simulate market movement
+  // Periodically refresh SOL price from the API
   const priceRefreshInterval = setInterval(() => {
-    if (currency.value === 'SOL') {
-      fetchSolPrice()
-    }
+    fetchSolPrice() // Always refresh, needed for SOL display if currency changes
   }, 30000) // Every 30 seconds
   
   // Clean up interval on component unmount
   onUnmounted(() => {
     clearInterval(priceRefreshInterval)
+    clearInterval(countdownTimer) // Also clear the countdown timer
   })
 })
 
@@ -459,7 +461,7 @@ async function onPurchase() {
                 </svg>
                 <div class="flex flex-col">
                   <span :class="currency === 'SOL' ? 'text-white' : 'text-gray-400'">SOL</span>
-                  <span class="text-xs text-gray-500">${{ solPrice.toFixed(2) }} per SOL</span>
+                  <span class="text-xs text-gray-500">${{ solPrice?.toFixed(2) }} per SOL</span>
                 </div>
                 <!-- Loading indicator for price fetching -->
                 <div v-if="isFetchingPrice && currency === 'SOL'" class="absolute top-1 right-1">

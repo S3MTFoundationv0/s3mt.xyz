@@ -30,10 +30,14 @@ if [ -f scripts/prebuild/${SERVICE}.sh ]; then
     scripts/prebuild/${service}.sh
 fi
 
+HA_PROXY_FILE=${4:-haproxy_prod.cfg}
+
 echo "Building image locally...."
+echo "Service: $SERVICE"
 echo "Base Tag: $BASE_TAG"
 echo "Image Version: $IMAGE_VERSION"
 echo "Dockerfile: $BASE_FILE"
+echo "HA Proxy File: $HA_PROXY_FILE"
 echo
 echo
 
@@ -41,6 +45,7 @@ BUILDKIT_PROGRESS=plain docker build \
     -t $BASE_TAG \
     --build-arg "IMAGE_VERSION=$IMAGE_VERSION" \
     --build-arg "IMAGE_TAG=$BASE_TAG" \
+    --build-arg "HA_PROXY_FILE=$HA_PROXY_FILE" \
     --no-cache \
     --file=$BASE_FILE \
     .
