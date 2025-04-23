@@ -29,6 +29,7 @@ const wallet = useAnchorWallet()
 const loading = ref(false)
 const success = ref(false)
 const errorMsg = ref('')
+const transactionSignature = ref<string | null>(null)
 
 // Environment variables
 const config = useRuntimeConfig()
@@ -130,7 +131,7 @@ async function onPurchase() {
       )
 
       // Call purchase_usdc
-      await program.methods
+      const txSigUsdc = await program.methods
         .purchaseUsdc(usdcAmountBn, s3mtAmountBn)
         .accounts({
           buyer: publicKey.value,
@@ -142,6 +143,7 @@ async function onPurchase() {
           clock: SYSVAR_CLOCK_PUBKEY
         })
         .rpc()
+      transactionSignature.value = txSigUsdc
     } else {
       // Compute lamports for SOL purchase
       const lamportsBn = new BN(
@@ -149,7 +151,7 @@ async function onPurchase() {
       )
 
       // Call purchase_sol
-      await program.methods
+      const txSigSol = await program.methods
         .purchaseSol(lamportsBn, s3mtAmountBn)
         .accounts({
           buyer: publicKey.value,
@@ -159,6 +161,7 @@ async function onPurchase() {
           systemProgram: SystemProgram.programId
         })
         .rpc()
+      transactionSignature.value = txSigSol
     }
 
     success.value = true
@@ -220,6 +223,19 @@ async function onPurchase() {
 
       <p v-if="errorMsg" class="text-red-500 text-sm mt-2 text-center">{{ errorMsg }}</p>
       <p v-if="success" class="text-green-400 text-sm mt-2 text-center">Purchase successful!</p>
+      <div v-if="success && transactionSignature" class="text-center mt-2">
+        <p class="text-sm text-gray-300">
+          Transaction ID:
+          <a
+            :href="`https://solscan.io/tx/${transactionSignature}?cluster=devnet`"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-indigo-400 hover:text-indigo-300 underline break-all"
+          >
+            {{ transactionSignature }}
+          </a>
+        </p>
+      </div>
     </div>
   </div>
 </template>
