@@ -92,7 +92,7 @@ const recentPurchases = ref([
   { address: 'Qmx3...kL4s', amount: 10000, timestamp: new Date(Date.now() - 120 * 60000), currency: 'SOL' },
 ])
 
-function formatCurrency(val) {
+function formatCurrency(val: number) {
   return '$' + val.toFixed(2)
 }
 
@@ -210,7 +210,7 @@ async function fetchSolPrice() {
 }
 
 // Watch for currency changes to refetch price when switching to SOL
-watch(currency, (newCurrency) => {
+watch(currency, (newCurrency: 'USDC' | 'SOL') => {
   if (newCurrency === 'SOL') {
     fetchSolPrice();
   }
@@ -221,10 +221,8 @@ onMounted(() => {
   updateCountdown()
   countdownTimer = setInterval(updateCountdown, 1000)
   
-  // Fetch SOL price initially if currency is SOL
-  if (currency.value === 'SOL') {
-    fetchSolPrice()
-  }
+  // Fetch SOL price initially on load
+  fetchSolPrice()
   
   // For development - periodically refresh SOL price to simulate market movement
   const priceRefreshInterval = setInterval(() => {
@@ -236,6 +234,10 @@ onMounted(() => {
   // Clean up interval on component unmount
   onUnmounted(() => {
     clearInterval(priceRefreshInterval)
+    // Also clear the countdown timer
+    if (countdownTimer) {
+      clearInterval(countdownTimer);
+    }
   })
 })
 
@@ -538,6 +540,58 @@ async function onPurchase() {
             <span v-else>Purchase Tokens</span>
             <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-indigo-400/0 via-white/10 to-indigo-400/0 transform translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
           </button>
+
+          <!-- Status Feedback -->
+          <!-- Error Message -->
+          <div v-if="errorMsg" class="mb-6 animate__animated animate__fadeIn animate__faster">
+            <div class="bg-red-900/30 border border-red-700/50 rounded-lg p-4 shadow-lg">
+              <div class="flex items-center">
+                <div class="flex-shrink-0">
+                  <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+                <div class="ml-3">
+                  <p class="text-sm text-red-300">{{ errorMsg }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Success Message -->
+          <div v-if="success" class="mb-6 animate__animated animate__fadeIn animate__faster">
+            <div class="bg-green-900/30 border border-green-700/50 rounded-lg p-4 shadow-lg">
+              <div class="flex items-start">
+                <div class="flex-shrink-0">
+                  <svg class="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+                <div class="ml-3 flex-1">
+                  <p class="text-sm text-green-300 font-medium">Purchase successful!</p>
+                  
+                  <!-- Transaction Info -->
+                  <div v-if="transactionSignature" class="mt-2 p-3 bg-gray-800/80 rounded-md border border-gray-700/50">
+                    <p class="text-xs text-gray-400 mb-1">Transaction ID:</p>
+                    <div class="flex items-center">
+                      <code class="text-xs font-mono text-indigo-300 truncate mr-2 flex-1">{{ transactionSignature }}</code>
+                      <a
+                        :href="`https://solscan.io/tx/${transactionSignature}?cluster=devnet`"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="text-indigo-400 hover:text-indigo-300 transition-colors flex-shrink-0"
+                      >
+                        <span class="sr-only">View on Solscan</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -579,57 +633,7 @@ async function onPurchase() {
       </div>
     </div>
 
-    <!-- Status Feedback -->
-    <!-- Error Message -->
-    <div v-if="errorMsg" class="mb-6 animate__animated animate__fadeIn animate__faster">
-      <div class="bg-red-900/30 border border-red-700/50 rounded-lg p-4 shadow-lg">
-        <div class="flex items-center">
-          <div class="flex-shrink-0">
-            <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-            </svg>
-          </div>
-          <div class="ml-3">
-            <p class="text-sm text-red-300">{{ errorMsg }}</p>
-          </div>
-        </div>
-      </div>
-    </div>
 
-    <!-- Success Message -->
-    <div v-if="success" class="mb-6 animate__animated animate__fadeIn animate__faster">
-      <div class="bg-green-900/30 border border-green-700/50 rounded-lg p-4 shadow-lg">
-        <div class="flex items-start">
-          <div class="flex-shrink-0">
-            <svg class="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-            </svg>
-          </div>
-          <div class="ml-3 flex-1">
-            <p class="text-sm text-green-300 font-medium">Purchase successful!</p>
-            
-            <!-- Transaction Info -->
-            <div v-if="transactionSignature" class="mt-2 p-3 bg-gray-800/80 rounded-md border border-gray-700/50">
-              <p class="text-xs text-gray-400 mb-1">Transaction ID:</p>
-              <div class="flex items-center">
-                <code class="text-xs font-mono text-indigo-300 truncate mr-2 flex-1">{{ transactionSignature }}</code>
-                <a
-                  :href="`https://solscan.io/tx/${transactionSignature}?cluster=devnet`"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="text-indigo-400 hover:text-indigo-300 transition-colors flex-shrink-0"
-                >
-                  <span class="sr-only">View on Solscan</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                  </svg>
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
