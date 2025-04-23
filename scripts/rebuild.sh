@@ -20,6 +20,7 @@ SERVICE=$(echo $1 | tr '[:upper:]' '[:lower:]')
 BASE_TAG=ghcr.io/theblockcrypto/$SERVICE:latest
 CURRENT_DIR=$(pwd)
 IMAGE_VERSION=$(cd apps/$1 && git describe --tags --always --dirty)
+HA_PROXY_FILE=${3:-haproxy_prod.cfg}
 cd $CURRENT_DIR
 BASE_FILE=docker/dockerfiles/$1/rebuild
 
@@ -39,6 +40,7 @@ docker build \
     -t $BASE_TAG \
     --build-arg "IMAGE_VERSION=$IMAGE_VERSION" \
     --build-arg "IMAGE_TAG=$BASE_TAG" \
+    --build-arg "HA_PROXY_FILE=$HA_PROXY_FILE" \
     --no-cache \
     --file=$BASE_FILE \
     ./
