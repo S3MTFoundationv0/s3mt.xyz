@@ -17,13 +17,27 @@
         </div>
         <div v-else class="text-sm text-yellow-500 flex items-center">
           <span class="h-2 w-2 rounded-full bg-yellow-500 mr-2"></span>
-          <span>Connect Wallet</span>
+          <span>Wallet Not Connected</span>
         </div>
       </div>
 
-      <!-- Form Body with Enhanced Controls -->
-      <div class="p-6 space-y-6">
-        <!-- Currency Selection -->
+      <!-- Wallet Connection Prompt (shown when wallet is not connected) -->
+      <div v-if="!connected" class="p-6">
+        <div class="bg-indigo-900/30 border border-indigo-700/50 rounded-lg p-6 shadow-lg mb-4">
+          <svg class="h-12 w-12 text-indigo-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
+          <h4 class="text-xl font-semibold text-white mb-2 text-center">Connect Your Wallet</h4>
+          <p class="text-gray-300 mb-4 text-center">Please connect your Solana wallet to purchase S3MT tokens.</p>
+          <div class="flex justify-center">
+            <WalletConnect class="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-medium rounded-lg py-3 px-6 shadow-lg transition-all duration-200" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Body with Enhanced Controls (shown when wallet is connected) -->
+      <div v-else class="p-6 space-y-6">
+        <!-- Currency Selection with Balance Display -->
         <div>
           <label class="block text-sm font-medium text-gray-300 mb-2">Select Currency</label>
           <div class="grid grid-cols-2 gap-4">
@@ -37,9 +51,15 @@
               ]"
             >
               <span class="text-blue-300 text-lg mr-2">$</span>
-              <div class="flex flex-col">
+              <div class="flex flex-col flex-1">
                 <span :class="currency === 'USDC' ? 'text-white' : 'text-gray-400'">USDC</span>
                 <span class="text-xs text-gray-500">1:1 with USD</span>
+                <span v-if="balances.usdc !== null" class="text-xs mt-1" :class="currency === 'USDC' ? 'text-blue-300' : 'text-gray-400'">
+                  Balance: {{ formatBalance(balances.usdc, 'USDC') }}
+                </span>
+                <span v-else-if="isLoadingBalances" class="text-xs mt-1 text-gray-400">
+                  Loading...
+                </span>
               </div>
             </div>
             <div
@@ -56,9 +76,15 @@
                 <path d="M93.94 109.6H13.72a2.62 2.62 0 0 1-1.85-4.47l19.22-19.22a2.62 2.62 0 0 1 1.85-.76h80.22a2.62 2.62 0 0 1 1.85 4.47L95.79 108.83a2.62 2.62 0 0 1-1.85.77Z" fill="currentColor"/>
                 <path d="M114.6 76.5H34.38a2.62 2.62 0 0 1-1.85-4.47l19.22-19.22a2.62 2.62 0 0 1 1.85-.77H114.6a2.62 2.62 0 0 1 1.85 4.47L97.23 75.73a2.62 2.62 0 0 1-1.85.77Z" fill="currentColor"/>
               </svg>
-              <div class="flex flex-col">
+              <div class="flex flex-col flex-1">
                 <span :class="currency === 'SOL' ? 'text-white' : 'text-gray-400'">SOL</span>
                 <span class="text-xs text-gray-500">${{ solPrice.toFixed(2) }} per SOL</span>
+                <span v-if="balances.sol !== null" class="text-xs mt-1" :class="currency === 'SOL' ? 'text-purple-300' : 'text-gray-400'">
+                  Balance: {{ formatBalance(balances.sol, 'SOL') }}
+                </span>
+                <span v-else-if="isLoadingBalances" class="text-xs mt-1 text-gray-400">
+                  Loading...
+                </span>
               </div>
               <div v-if="isFetchingPrice && currency === 'SOL'" class="absolute top-1 right-1">
                 <svg class="animate-spin h-3 w-3 text-purple-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -68,6 +94,16 @@
               </div>
             </div>
           </div>
+        </div>
+
+        <!-- Max Button -->
+        <div v-if="canUseMax && showMaxButton" class="text-right">
+          <button 
+            @click="useMaxBalance" 
+            class="text-xs text-indigo-400 hover:text-indigo-300 transition-colors underline"
+          >
+            Use Max Balance
+          </button>
         </div>
 
         <!-- Token Amount Input -->
@@ -119,12 +155,20 @@
               <span v-if="currency === 'SOL'" class="ml-2 text-xs text-gray-400">(≈ ${{ totalCostInUsd.toFixed(2) }})</span>
             </div>
           </div>
+
+          <!-- Insufficient Balance Warning -->
+          <div v-if="insufficientBalance" class="mt-3 text-sm text-yellow-500 flex items-center">
+            <svg class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+            </svg>
+            Insufficient balance
+          </div>
         </div>
 
         <!-- Submit Button -->
         <button
           @click="purchase"
-          :disabled="!isValid || loading"
+          :disabled="!isValid || loading || insufficientBalance"
           class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-medium rounded-lg py-3 shadow-lg disabled:opacity-50 transition-all duration-200 relative overflow-hidden group"
         >
           <span v-if="loading" class="flex items-center justify-center">
@@ -192,7 +236,8 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineEmits } from 'vue'
+import { defineProps, defineEmits, computed, ref, watch } from 'vue'
+import { LAMPORTS_PER_SOL } from '@solana/web3.js'
 
 const props = defineProps({
   currency: { type: String, required: true },
@@ -207,10 +252,52 @@ const props = defineProps({
   loading: { type: Boolean, required: true },
   success: { type: Boolean, required: true },
   errorMsg: { type: String, required: true },
-  transactionSignature: { type: String, default: null }
+  transactionSignature: { type: String, default: null },
+  walletBalances: { 
+    type: Object, 
+    default: () => ({ 
+      sol: null, 
+      usdc: null 
+    }) 
+  },
+  totalCost: { type: Number, required: true }
 })
 
 const emit = defineEmits(['purchase', 'update:currency', 'update:amount'])
+
+// Local state for balances
+const balances = ref({
+  sol: null as number | null,
+  usdc: null as number | null
+})
+
+const isLoadingBalances = ref(true)
+const showMaxButton = ref(true)
+
+// Watch for wallet connection and balance updates
+watch(() => props.connected, (isConnected) => {
+  if (isConnected) {
+    fetchBalances()
+  } else {
+    // Reset balances when wallet disconnected
+    balances.value = { sol: null, usdc: null }
+  }
+})
+
+// Watch for wallet balance updates from parent
+watch(() => props.walletBalances, (newBalances) => {
+  if (newBalances) {
+    balances.value = { ...newBalances }
+    isLoadingBalances.value = false
+  }
+}, { immediate: true })
+
+// Watch for currency changes to fetch the right balance
+watch(() => props.currency, () => {
+  if (props.connected) {
+    fetchBalances()
+  }
+})
 
 function updateCurrency(val: string) {
   emit('update:currency', val)
@@ -225,6 +312,71 @@ function updateAmount(event: Event) {
 function purchase() {
   emit('purchase')
 }
+
+function fetchBalances() {
+  isLoadingBalances.value = true;
+  // This event will be handled by the parent component to fetch wallet balances
+  emit('fetch-balances');
+  
+  // Safety timeout to prevent infinite loading state
+  setTimeout(() => {
+    if (isLoadingBalances.value) {
+      console.log('Balance fetch timeout - resetting loading state');
+      isLoadingBalances.value = false;
+    }
+  }, 5000); // 5 second timeout
+}
+
+function formatBalance(balance: number | null, type: 'SOL' | 'USDC') {
+  if (balance === null) return '0'
+  
+  if (type === 'SOL') {
+    return `${(balance / LAMPORTS_PER_SOL).toFixed(4)} SOL`
+  } else {
+    return `${(balance / 1000000).toFixed(2)} USDC`
+  }
+}
+
+function useMaxBalance() {
+  if (!canUseMax.value) return
+  
+  if (props.currency === 'SOL') {
+    // Leave some SOL for transaction fees
+    const maxSol = Math.max(0, (balances.value.sol || 0) / LAMPORTS_PER_SOL - 0.01)
+    const maxTokens = Math.floor(maxSol * props.solPrice / 0.10) // 0.10 is the token price in USD
+    emit('update:amount', maxTokens)
+  } else {
+    // USDC
+    const maxUsdc = (balances.value.usdc || 0) / 1000000 // Convert from USDC base units
+    const maxTokens = Math.floor(maxUsdc / 0.10) // 0.10 is the token price in USD
+    emit('update:amount', maxTokens)
+  }
+}
+
+// Computed values
+const canUseMax = computed(() => {
+  if (!props.connected) return false
+  
+  const relevantBalance = props.currency === 'SOL' 
+    ? balances.value.sol
+    : balances.value.usdc
+    
+  return relevantBalance !== null && relevantBalance > 0
+})
+
+const insufficientBalance = computed(() => {
+  if (!props.connected || props.amount <= 0) return false
+  
+  if (props.currency === 'SOL') {
+    // Convert totalCost to lamports for comparison
+    const costInLamports = props.totalCost * LAMPORTS_PER_SOL
+    return (balances.value.sol || 0) < costInLamports
+  } else {
+    // Convert totalCost to USDC base units for comparison
+    const costInUsdcUnits = props.totalCostInUsd * 1000000
+    return (balances.value.usdc || 0) < costInUsdcUnits
+  }
+})
 </script>
 
 <style>
