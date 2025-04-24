@@ -1,362 +1,33 @@
 <script setup lang="ts">
 import { useWallet } from 'solana-wallets-vue'
-import { Connection, PublicKey, LAMPORTS_PER_SOL, Message, VersionedMessage } from '@solana/web3.js'
-import { AnchorProvider, Program, BN, type Idl } from '@coral-xyz/anchor' // Import Anchor items
-import presaleIdl from '~/programs/s3mt_presale.idl.json' // Import the IDL
-import { Buffer } from 'buffer' // Import Buffer
-import * as bs58 from 'bs58' // Import bs58
-
-useSWV()
+import { PublicKey } from '@solana/web3.js'
+import { useTransactionHistory, type ParsedTransaction } from '~/composables/useTransactionHistory'
 
 useHead({
   title: 'Transaction History',
   meta: [{ name: 'description', content: 'View presale transaction history.' }]
 })
 
-// Define a type for better structure
-interface ParsedTransaction {
-  signature: string;
-  blockTime: number | null | undefined;
-  buyer: string | null;
-  s3mtAmount: string;
-  cost: string;
-  currency: 'SOL' | 'USDC' | 'N/A';
-  isUserTransaction: boolean;
-}
-
-// Wallet & UI state
 const { connected, publicKey } = useWallet()
-// Transaction history composable
-const { transactions: fetchedTransactions, loading, errorMsg, fetchTransactionHistory } = useTransactionHistory()
-onMounted(() => fetchTransactionHistory())
+const { transactions, loading, errorMsg, statsMetrics } = useTransactionHistory()
 
-// Create computed property for display
 const displayTransactions = computed(() => {
-  return fetchedTransactions.value.map((tx: ParsedTransaction) => ({
+  const currentUserKey = publicKey.value;
+  return transactions.value.map((tx: ParsedTransaction) => ({
     ...tx,
-    isUserTransaction: !!(publicKey.value && tx.buyer && new PublicKey(tx.buyer).equals(publicKey.value))
+    isUserTransaction: !!(currentUserKey && tx.buyer && new PublicKey(tx.buyer).equals(currentUserKey))
   }));
 });
 
-// Environment variables & Connection
-const config = useRuntimeConfig()
-const rpcUrl = config.public.solanaNetwork
-const presaleProgramId = new PublicKey(config.public.presaleProgramId)
-const usdcMintAddress = new PublicKey(config.public.usdcMint) // Needed for parsing USDC tx
-const connection = new Connection(rpcUrl, { commitment: 'finalized' }) // Use finalized for history
-
-// --- Anchor Setup for Parsing ---
-// Create a dummy provider as we only need the connection and coder
-const provider = new AnchorProvider(connection, {} as any, { commitment: 'confirmed' });
-// Helper to fix IDL PublicKey strings if necessary (copy from founders.vue or ensure IDL is correct)
-const fixIdlPublicKeys = (idl: any) => {
-  return { ...idl, metadata: { ...(idl.metadata || {}), address: presaleProgramId.toString() } };
-};
-// Cast IDL
-const program = new Program(fixIdlPublicKeys(presaleIdl as any) as Idl, provider);
-// --- End Anchor Setup ---
-
-
-async function fetchAndParseTransactions() {
-  loading.value = true
-  errorMsg.value = ''
-  fetchedTransactions.value = []
-  try {
-    // --- Paginated Signature Fetching ---
-    const allSignaturesInfo: any[] = []; // Array to hold all signature info objects
-    let oldestSignature: string | undefined = undefined;
-    const batchLimit = 100; // How many signatures to fetch per RPC call
-    console.log("Starting transaction signature fetching...");
-
-    while (true) {
-      console.log(`Fetching signatures before: ${oldestSignature || 'start'}`);
-      const signaturesInfo = await connection.getSignaturesForAddress(
-        presaleProgramId,
-        {
-          limit: batchLimit,
-          before: oldestSignature
-        },
-        'finalized' // Explicitly request finalized commitment here
-      );
-
-      if (signaturesInfo.length === 0) {
-        console.log("No more signatures found, breaking loop.");
-        break; // Exit loop if no more signatures are found
-      }
-
-      allSignaturesInfo.push(...signaturesInfo);
-      oldestSignature = signaturesInfo[signaturesInfo.length - 1].signature;
-      console.log(`Fetched ${signaturesInfo.length} signatures. Oldest is now: ${oldestSignature}`);
-
-      // Optional: Add a small delay to avoid rate limiting on public RPCs
-      // await new Promise(resolve => setTimeout(resolve, 200));
-
-      // Safety break if something goes wrong (e.g., infinite loop possibility)
-      if (allSignaturesInfo.length > 2000) { // Adjust limit as needed
-         console.warn("Reached signature fetch limit (2000), stopping pagination.");
-         break;
-      }
-    }
-    console.log(`Total signatures fetched: ${allSignaturesInfo.length}`);
-    // --- End Paginated Fetching ---
-
-    if (allSignaturesInfo.length === 0) {
-      errorMsg.value = 'No transactions found for this program yet.'
-      loading.value = false
-      return
-    }
-
-    // Extract just the signatures string array for getTransactions
-    const signatures = allSignaturesInfo.map(sigInfo => sigInfo.signature)
-
-    // 2. Fetch Full Transaction Details (Consider batching this if signature list is huge)
-    console.log(`Fetching details for ${signatures.length} transactions...`);
-    const fetchedTxs = await connection.getTransactions(signatures, {
-      commitment: 'finalized',
-      maxSupportedTransactionVersion: 0
-    })
-    console.log(`Fetched details complete.`);
-
-    const parsedTxs: ParsedTransaction[] = []
-
-    // 3. Parse Each Transaction
-    console.log("Parsing transactions...");
-    for (let i = 0; i < fetchedTxs.length; i++) {
-      const tx = fetchedTxs[i]
-      // Find corresponding sigInfo using the signature for correct blockTime
-      const sigInfo = allSignaturesInfo.find(info => info.signature === signatures[i]);
-
-      if (!tx || !tx.transaction || !tx.meta) {
-        console.warn(`Skipping null transaction for signature: ${signatures[i]}`)
-        continue;
-      }
-
-      let parsedData: ParsedTransaction = {
-        signature: signatures[i],
-        blockTime: sigInfo?.blockTime,
-        buyer: null,
-        s3mtAmount: 'N/A',
-        cost: 'N/A',
-        currency: 'N/A',
-        isUserTransaction: false
-      }
-
-      try {
-        const message = tx.transaction.message;
-        let accountKeys: PublicKey[];
-        // Use a common structure for processing instructions
-        let processedInstructions: { programIdIndex: number; accounts: number[]; data: string | Uint8Array | Buffer }[] = [];
-
-        // Check for VersionedMessage using property existence
-        if ('addressTableLookups' in message) {
-           // Versioned Message (potentially V0)
-           const msgV0 = message as VersionedMessage; // Cast for type safety
-           accountKeys = msgV0.staticAccountKeys.concat(msgV0.addressTableLookups ? await getKeysFromLookups(msgV0.addressTableLookups) : []);
-           // Map CompiledInstruction to our common structure
-           processedInstructions = msgV0.compiledInstructions.map(ix => ({
-             programIdIndex: ix.programIdIndex,
-             accounts: ix.accountKeyIndexes, // Use accountKeyIndexes
-             data: ix.data // data is typically Uint8Array here
-           }));
-        } else {
-           // Legacy Message
-           const msgLegacy = message as Message; // Cast for type safety
-           accountKeys = msgLegacy.accountKeys;
-           // Map TransactionInstruction to our common structure
-           processedInstructions = msgLegacy.instructions.map(ix => ({
-             programIdIndex: ix.programIdIndex,
-             // Map pubkeys back to indices in the legacy accountKeys array - Fix cast
-             accounts: ix.accounts.map(accMeta => accountKeys.findIndex(key => key.equals((accMeta as unknown).pubkey))),
-             data: ix.data // data is Buffer here
-           }));
-        }
-
-        // Find the instruction related to our program using the common structure
-        const ix = processedInstructions.find(ix =>
-          accountKeys[ix.programIdIndex]?.equals(presaleProgramId) // Add optional chaining
-        );
-
-        if (ix && ix.data) { // Check if ix and ix.data exist
-          let dataBuffer: Buffer;
-          // Ensure data is a Buffer for the decoder
-          if (ix.data instanceof Uint8Array) {
-              dataBuffer = Buffer.from(ix.data);
-          } else if (typeof ix.data === 'string') {
-              // Use bs58 to decode base58 string
-              try {
-                  dataBuffer = Buffer.from(bs58.decode(ix.data));
-              } catch (e) {
-                  console.warn(`Failed to decode base58 data for signature: ${parsedData.signature}`, ix.data, e);
-                  continue;
-              }
-          } else if (Buffer.isBuffer(ix.data)) {
-               dataBuffer = ix.data;
-          }
-           else {
-              console.warn(`Instruction data has unexpected type for signature: ${parsedData.signature}`, ix.data);
-              continue; // Skip if data type is wrong
-          }
-
-          // Use bracket notation for decode - Cast coder to any to suppress linter
-          const decodedIx = (program.coder.instruction as any).decode(dataBuffer);
-
-          if (decodedIx) {
-            // Use the account indices from our common structure
-            const buyerAccountIndex = ix.accounts[0]; // Assuming buyer is index 0
-            const buyerPk = accountKeys[buyerAccountIndex];
-            if (buyerPk) {
-              parsedData.buyer = buyerPk.toBase58();
-              // Check if this transaction belongs to the connected user
-              if (publicKey.value && buyerPk.equals(publicKey.value)) {
-                parsedData.isUserTransaction = true;
-              }
-            } else {
-               console.warn(`Could not resolve buyer public key for index ${buyerAccountIndex} in signature: ${parsedData.signature}`);
-            }
-
-            // Extract data based on instruction name
-            if (decodedIx.name === 'purchaseUsdc') {
-              // Standardize field name to s3MtAmount
-              const s3MtAmount = decodedIx.data.s3MtAmount as BN;
-              const usdcAmount = decodedIx.data.usdcAmount as BN;
-              parsedData.s3mtAmount = s3MtAmount.toString();
-              parsedData.cost = (usdcAmount.toNumber() / 1e6).toFixed(6);
-              parsedData.currency = 'USDC';
-            } else if (decodedIx.name === 'purchaseSol') {
-              const s3MtAmount = decodedIx.data.s3MtAmount as BN;
-              const solAmount = decodedIx.data.solAmount as BN;
-              parsedData.s3mtAmount = s3MtAmount.toString();
-              parsedData.cost = (solAmount.toNumber() / LAMPORTS_PER_SOL).toFixed(9);
-              parsedData.currency = 'SOL';
-            }
-          } else {
-             console.warn(`Could not decode instruction data buffer for signature: ${parsedData.signature}`);
-          }
-        } else {
-           console.warn(`No instruction found for program ${presaleProgramId} or ix.data is missing in signature: ${parsedData.signature}`);
-        }
-      } catch (parseError) {
-        console.error(`Error parsing transaction ${parsedData.signature}:`, parseError)
-        // Keep basic info even if parsing fails
-      }
-      parsedTxs.push(parsedData)
-    } // End loop
-
-    fetchedTransactions.value = parsedTxs
-    console.log("Parsing complete.");
-
-  } catch (err) {
-    console.error('Error fetching or parsing transactions:', err)
-    errorMsg.value = err instanceof Error ? err.message : String(err)
-  } finally {
-    loading.value = false
-  }
-}
-
-// Helper function to resolve Address Lookup Table keys (simplified, might need more robust implementation)
-async function getKeysFromLookups(lookups: any[]): Promise<PublicKey[]> {
-    let keys: PublicKey[] = [];
-    for (const lookup of lookups) {
-        try {
-            // Safety check before accessing accountKey
-            if (!lookup || !lookup.accountKey) {
-                console.warn("Invalid lookup object found:", lookup);
-                continue;
-            }
-            const tableAccount = await connection.getAddressLookupTable(lookup.accountKey);
-            if (tableAccount && tableAccount.value) {
-                const lookupKeys = tableAccount.value.state.addresses;
-                keys = keys.concat(lookupKeys);
-            } else {
-              // Log the key safely
-              console.warn("Could not fetch or find addresses in lookup table:", lookup.accountKey.toBase58());
-            }
-        } catch (e) {
-            console.error(`Error fetching lookup table for key ${lookup?.accountKey?.toBase58()}:`, e);
-        }
-    }
-    return keys;
-}
-
-// Format timestamp
 function formatTimestamp(unixTimestamp: number | null | undefined): string {
   if (unixTimestamp === null || typeof unixTimestamp === 'undefined') return 'N/A'
   return new Date(unixTimestamp * 1000).toLocaleString()
 }
 
-// Truncate public key
 function truncateKey(key: string | null | undefined): string {
   if (!key) return 'N/A'
   return `${key.substring(0, 4)}...${key.substring(key.length - 4)}`
 }
-
-// Computed metrics for the stats dashboard
-const statsMetrics = computed(() => {
-  const transactions = fetchedTransactions.value;
-  
-  // Total number of transactions
-  const totalTransactions = transactions.length;
-  
-  // Total S3MT tokens purchased
-  const totalS3mtPurchased = transactions.reduce((total, tx) => {
-    if (tx.s3mtAmount && tx.s3mtAmount !== 'N/A') {
-      // Try to parse the s3mtAmount
-      try {
-        return total + Number(tx.s3mtAmount);
-      } catch (e) {
-        return total;
-      }
-    }
-    return total;
-  }, 0);
-  
-  // Total spent in each currency
-  const totalSpentByType = transactions.reduce((acc, tx) => {
-    if (tx.cost && tx.cost !== 'N/A' && tx.currency) {
-      try {
-        const cost = Number(tx.cost);
-        acc[tx.currency] = (acc[tx.currency] || 0) + cost;
-      } catch (e) {
-        // Skip if we can't parse the cost
-      }
-    }
-    return acc;
-  }, {} as Record<string, number>);
-  
-  // Calculate average purchase size
-  const avgPurchaseSize = totalTransactions > 0 
-    ? (totalS3mtPurchased / totalTransactions).toFixed(2) 
-    : '0';
-  
-  // Format the SOL and USDC totals nicely
-  const totalSolSpent = totalSpentByType['SOL'] ? totalSpentByType['SOL'].toFixed(4) : '0';
-  const totalUsdcSpent = totalSpentByType['USDC'] ? totalSpentByType['USDC'].toFixed(2) : '0';
-    
-  // Recent activity - count transactions in last 24 hours
-  const last24HoursCount = transactions.filter(tx => {
-    if (tx.blockTime) {
-      const txTime = new Date(tx.blockTime * 1000);
-      const now = new Date();
-      const diffMs = now.getTime() - txTime.getTime();
-      const diffHours = diffMs / (1000 * 60 * 60);
-      return diffHours <= 24;
-    }
-    return false;
-  }).length;
-  
-  return {
-    totalTransactions,
-    totalS3mtPurchased: totalS3mtPurchased.toLocaleString(),
-    totalSolSpent,
-    totalUsdcSpent,
-    avgPurchaseSize,
-    last24HoursCount
-  };
-});
-
-onMounted(() => {
-  fetchAndParseTransactions() // Call the new combined function
-})
 </script>
 
 <template>
@@ -372,7 +43,7 @@ onMounted(() => {
     </div>
 
     <!-- Stats Dashboard -->
-    <div v-if="displayTransactions.length > 0" class="mb-10 animate__animated animate__fadeIn">
+    <div v-if="!loading && displayTransactions.length > 0" class="mb-10 animate__animated animate__fadeIn">
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <!-- Total Transactions Card -->
         <div class="bg-gray-800/70 rounded-xl p-5 border border-gray-700/50 shadow-lg backdrop-blur-sm overflow-hidden relative group">
