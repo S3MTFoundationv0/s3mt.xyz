@@ -87,8 +87,16 @@ const { transactions, loading: historyLoading, errorMsg: historyError, fetchTran
 
 // Presale stats (would typically come from an API/contract)
 const PRESALE_ALLOCATION =  1_000_000_000 // Total tokens in presale
-const TOKENS_SOLD = computed(() => statsMetrics.value.totalS3mtPurchased) // Tokens sold so far
-const SALE_PROGRESS = computed(() => Math.min(100, (TOKENS_SOLD.value / PRESALE_ALLOCATION) * 100))
+const TOKENS_SOLD = computed(() => statsMetrics.value?.totalS3mtPurchased ?? 0) // Tokens sold so far, default to 0
+const SALE_PROGRESS = computed(() => {
+  const sold = TOKENS_SOLD.value;
+  const allocation = PRESALE_ALLOCATION;
+  // Ensure allocation is not zero and sold is a valid number
+  if (allocation === 0 || typeof sold !== 'number' || isNaN(sold)) {
+    return 0;
+  }
+  return Math.min(100, (sold / allocation) * 100);
+})
 
 // End date for the presale
 const PRESALE_END_DATE = new Date(config.public.presaleEndDate)
