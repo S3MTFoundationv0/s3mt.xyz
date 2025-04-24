@@ -263,7 +263,7 @@ const props = defineProps({
   totalCost: { type: Number, required: true }
 })
 
-const emit = defineEmits(['purchase', 'update:currency', 'update:amount'])
+const emit = defineEmits(['purchase', 'update:currency', 'update:amount', 'fetch-balances'])
 
 // Local state for balances
 const balances = ref({
@@ -275,7 +275,7 @@ const isLoadingBalances = ref(true)
 const showMaxButton = ref(true)
 
 // Watch for wallet connection and balance updates
-watch(() => props.connected, (isConnected) => {
+watch(() => props.connected, (isConnected: boolean) => {
   if (isConnected) {
     fetchBalances()
   } else {
@@ -285,7 +285,7 @@ watch(() => props.connected, (isConnected) => {
 })
 
 // Watch for wallet balance updates from parent
-watch(() => props.walletBalances, (newBalances) => {
+watch(() => props.walletBalances, (newBalances: { sol: number | null, usdc: number | null } | undefined) => {
   if (newBalances) {
     balances.value = { ...newBalances }
     isLoadingBalances.value = false
