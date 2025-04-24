@@ -57,13 +57,56 @@
 </template>
 
 <script setup>
-import { defineProps } from 'vue'
-
 const props = defineProps({
   tokensSold: { type: Number, required: true },
   presaleAllocation: { type: Number, required: true },
   saleProgress: { type: Number, required: true },
-  formattedTokenPrice: { type: String, required: true },
-  countdown: { type: Object, required: true }
+  formattedTokenPrice: { type: String, required: true }
+})
+
+const config = useRuntimeConfig().public
+
+const countdown = ref({
+  days: '00',
+  hours: '00',
+  minutes: '00',
+  seconds: '00'
+})
+
+let intervalId = null
+
+const calculateCountdown = () => {
+  const endDate = new Date(config.presaleEndDate).getTime();
+  const now = new Date().getTime();
+  const distance = endDate - now;
+
+  if (distance < 0) {
+    countdown.value = { days: '00', hours: '00', minutes: '00', seconds: '00' };
+    if (intervalId) clearInterval(intervalId);
+    return;
+  }
+
+  const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+  countdown.value = {
+    days: String(days).padStart(2, '0'),
+    hours: String(hours).padStart(2, '0'),
+    minutes: String(minutes).padStart(2, '0'),
+    seconds: String(seconds).padStart(2, '0')
+  };
+}
+
+onMounted(() => {
+  calculateCountdown() // Initial calculation
+  intervalId = setInterval(calculateCountdown, 1000);
+})
+
+onUnmounted(() => {
+  if (intervalId) {
+    clearInterval(intervalId);
+  }
 })
 </script>
