@@ -9,7 +9,7 @@ useHead({
 })
 
 const { connected, publicKey } = useWallet()
-const { transactions, loading, errorMsg, statsMetrics } = useTransactionHistory()
+const { transactions, loading, errorMsg, statsMetrics, fetchTransactionHistory } = useTransactionHistory()
 
 const displayTransactions = computed(() => {
   const currentUserKey = publicKey.value;
@@ -120,18 +120,28 @@ function truncateKey(key: string | null | undefined): string {
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
         </svg>
-        <span class="text-xl text-indigo-300">Loading Transaction History...</span>
-        <p class="text-gray-500 mt-2 animate-pulse">Fetching from Solana blockchain</p>
+        <div class="relative px-8 py-6 backdrop-blur-sm bg-gray-800/70 rounded-xl border border-gray-700/50 shadow-lg max-w-lg">
+          <div class="absolute inset-0 bg-gradient-to-br from-indigo-600/10 to-purple-600/10 opacity-50 rounded-xl"></div>
+          <div class="relative z-10">
+            <span class="text-xl text-indigo-300 block mb-2">Loading Transaction History...</span>
+            <p class="text-gray-500 animate-pulse">Fetching from Solana blockchain</p>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div v-else-if="errorMsg" class="text-center bg-red-900/30 border border-red-700 p-8 rounded-xl shadow-lg">
+    <div v-else-if="errorMsg" class="text-center my-16">
       <div class="flex flex-col items-center">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-red-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
         </svg>
-        <h3 class="text-xl font-semibold text-red-400 mb-2">Error Loading Transactions</h3>
-        <p class="text-red-300">{{ errorMsg }}</p>
+        <div class="relative px-8 py-6 backdrop-blur-sm bg-gray-800/70 rounded-xl border border-red-700/50 shadow-lg max-w-lg overflow-hidden">
+          <div class="absolute inset-0 bg-gradient-to-br from-red-600/10 to-red-900/10 opacity-50 rounded-xl"></div>
+          <div class="relative z-10">
+            <h3 class="text-xl font-semibold text-red-400 mb-2">Error Loading Transactions</h3>
+            <p class="text-red-300/90">{{ errorMsg }}</p>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -142,9 +152,26 @@ function truncateKey(key: string | null | undefined): string {
         <!-- Table Header Stats -->
         <div class="p-4 border-b border-gray-700/70 bg-gray-800/90">
           <div class="flex flex-wrap justify-between items-center gap-4">
-            <div class="text-gray-300">
-              <span class="text-sm font-medium">Total Transactions:</span>
-              <span class="text-xl ml-2 font-bold text-white">{{ displayTransactions.length }}</span>
+            <div class="flex items-center gap-4 text-gray-300">
+              <div>
+                <span class="text-sm font-medium">Total Transactions:</span>
+                <span class="text-xl ml-2 font-bold text-white">{{ displayTransactions.length }}</span>
+              </div>
+              <button
+                @click="fetchTransactionHistory"
+                :disabled="loading"
+                :class="['relative overflow-hidden group h-9 w-9 flex items-center justify-center rounded-lg bg-gray-800/90 border border-gray-700/50 shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed', loading ? 'btn-loading' : '']"
+                title="Refresh History"
+              >
+                <div class="absolute inset-0 bg-gradient-to-br from-indigo-600/20 to-purple-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+                <svg v-if="loading" class="relative z-10 animate-spin h-5 w-5 text-indigo-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <svg v-else xmlns="http://www.w3.org/2000/svg" class="relative z-10 h-5 w-5 text-indigo-400 group-hover:text-indigo-300 transition-colors duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m-15.357-2a8.001 8.001 0 0015.357-2m0 0H15" />
+                </svg>
+              </button>
             </div>
             <div v-if="connected" class="text-sm text-indigo-300">
               <span class="mr-2 text-gray-400">Connected:</span>
@@ -221,8 +248,13 @@ function truncateKey(key: string | null | undefined): string {
         <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
-        <p class="text-xl text-gray-500">No transactions found yet.</p>
-        <p class="text-gray-600 mt-2">Be the first to participate in the presale!</p>
+        <div class="relative px-8 py-6 backdrop-blur-sm bg-gray-800/70 rounded-xl border border-gray-700/50 shadow-lg max-w-lg">
+          <div class="absolute inset-0 bg-gradient-to-br from-indigo-600/10 to-purple-600/10 opacity-50 rounded-xl"></div>
+          <div class="relative z-10">
+            <p class="text-xl text-gray-300 mb-2">No transactions found yet.</p>
+            <p class="text-gray-500">Be the first to participate in the presale!</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -236,6 +268,16 @@ function truncateKey(key: string | null | undefined): string {
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+}
+
+.btn-loading {
+  animation: pulse 1.5s infinite;
 }
 
 tbody tr {
