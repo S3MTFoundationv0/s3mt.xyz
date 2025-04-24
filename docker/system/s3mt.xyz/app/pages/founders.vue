@@ -396,10 +396,10 @@ async function onPurchase() {
 }
 </script>
 <template>
-  <div class="mx-auto px-4 sm:px-6 lg:px-8 py-12 max-w-4xl">
+  <div class="mx-auto px-4 sm:px-6 lg:px-8 py-12 max-w-4xl animate__animated animate__fadeIn animate__faster">
     <div class="particles-container absolute inset-0 overflow-hidden pointer-events-none"></div>
 
-    <FoundersHeader />
+    <FoundersHeader class="animate__animated animate__fadeIn animate__faster" />
 
     <FoundersStats
       :tokens-sold="TOKENS_SOLD"
@@ -407,6 +407,7 @@ async function onPurchase() {
       :sale-progress="SALE_PROGRESS"
       :formatted-token-price="formattedTokenPrice"
       :countdown="countdown"
+      class="animate__animated animate__fadeIn animate__faster"
     />
 
     <FoundersPurchaseForm
@@ -429,15 +430,21 @@ async function onPurchase() {
       @update:amount="amount = $event"
       @purchase="onPurchase"
       @fetch-balances="fetchWalletBalances"
+      class="animate__animated animate__fadeIn animate__faster"
     />
 
     <FoundersRecentPurchases 
       :recent-purchases="recentPurchases" 
       :loading="historyLoading" 
-      :error-msg="historyError" 
+      :error-msg="historyError"
+      class="animate__animated animate__fadeIn animate__faster" 
       @refresh="fetchTransactionHistory" 
     />
   </div>
 </template>
 
-<!-- Removed scoped styles; using global CSS and component-level styles -->
+<style>
+.animate__faster {
+  animation-duration: 0.5s !important;
+}
+</style>

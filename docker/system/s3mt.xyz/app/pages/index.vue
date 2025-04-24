@@ -32,23 +32,18 @@
         Smart. Secure. Sustainable. Join the movement where crypto meets clean energy.
       </p>
       <div class="flex justify-center gap-6 mt-8">
-        <NuxtLink to="/presale" class="btn btn-primary btn-lg btn-glow-primary">Buy Now</NuxtLink>
+        <NuxtLink to="/founders" class="btn btn-primary btn-lg btn-glow-primary">Buy Now</NuxtLink>
         <NuxtLink to="/whitepaper" class="btn btn-secondary btn-lg">Learn More</NuxtLink>
       </div>
     </div>
 
-    <!-- Remove Partners from here -->
-    <!-- 
-    <div class="relative z-10 flex flex-col justify-center items-center h-full text-center px-4">
+    <!-- New Section for Partners -->
+    <section class="bg-base-200 py-20">
       <Partners />
-    </div>
-    -->
+    </section>
   </section>
 
-  <!-- New Section for Partners -->
-  <section class="bg-base-200 py-20">
-    <Partners />
-  </section>
+  
   
 </template>
 

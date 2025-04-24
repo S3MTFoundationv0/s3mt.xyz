@@ -1,5 +1,5 @@
 <template>
-  <div id="invest" class="relative mb-8 animate__animated animate__fadeIn animate__delay-3s">
+  <div id="invest" class="relative mb-8 animate__animated animate__fadeIn animate__faster">
     <!-- Background Gradient Effect -->
     <div class="absolute inset-0 bg-gradient-to-br from-indigo-600/20 via-purple-500/20 to-indigo-700/20 rounded-xl blur-xl opacity-30"></div>
 
@@ -22,7 +22,7 @@
       </div>
 
       <!-- Wallet Connection Prompt (shown when wallet is not connected) -->
-      <div v-if="!connected" class="p-6">
+      <div v-if="!connected" class="p-6 animate__animated animate__fadeIn animate__faster">
         <div class="bg-indigo-900/30 border border-indigo-700/50 rounded-lg p-6 shadow-lg mb-4">
           <svg class="h-12 w-12 text-indigo-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -36,7 +36,7 @@
       </div>
 
       <!-- Form Body with Enhanced Controls (shown when wallet is connected) -->
-      <div v-else class="p-6 space-y-6">
+      <div v-else class="p-6 space-y-6 animate__animated animate__fadeIn animate__faster">
         <!-- Currency Selection with Balance Display -->
         <div>
           <label class="block text-sm font-medium text-gray-300 mb-2">Select Currency</label>
@@ -410,6 +410,11 @@ input[type="number"]::-webkit-outer-spin-button {
   box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
   animation: pulse 2s infinite;
   animation-delay: var(--delay, 0s);
+}
+
+/* Custom animation speed for faster animate.css animations */
+.animate__faster {
+  animation-duration: 0.5s !important;
 }
 
 @keyframes pulse {
