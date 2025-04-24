@@ -4,10 +4,6 @@ import { Connection, PublicKey, SystemProgram, SYSVAR_CLOCK_PUBKEY, LAMPORTS_PER
 import { AnchorProvider, Program, BN } from '@coral-xyz/anchor'
 import { getAssociatedTokenAddress, TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import presaleIdl from '~/programs/s3mt_presale.idl.json'
-import FoundersHeader from '~/components/FoundersHeader.vue'
-import FoundersStats from '~/components/FoundersStats.vue'
-import FoundersPurchaseForm from '~/components/FoundersPurchaseForm.vue'
-import FoundersRecentPurchases from '~/components/FoundersRecentPurchases.vue'
 
 useSWV()
 
@@ -89,12 +85,19 @@ const PRESALE_END_DATE = new Date('2024-07-25T23:59:59Z')
 const countdown = ref({ days: 0, hours: 0, minutes: 0, seconds: 0 })
 let countdownTimer: any = null
 
-// Recent purchases for social proof (would come from API/blockchain in real app)
-const recentPurchases = ref([
-  { address: '8iGJ...UhQx', amount: 5000, timestamp: new Date(Date.now() - 12 * 60000), currency: 'SOL' },
-  { address: 'Dv9q...zPF7', amount: 2500, timestamp: new Date(Date.now() - 45 * 60000), currency: 'USDC' },
-  { address: 'Qmx3...kL4s', amount: 10000, timestamp: new Date(Date.now() - 120 * 60000), currency: 'SOL' },
-])
+// Recent purchases for social proof (fetched from blockchain via composable)
+const { transactions, loading: historyLoading, errorMsg: historyError, fetchTransactionHistory } = useTransactionHistory()
+onMounted(() => {
+  fetchTransactionHistory()
+})
+const recentPurchases = computed(() =>
+  transactions.value.slice(0, 5).map(tx => ({
+    address: tx.buyer || '',
+    amount: Number(tx.s3mtAmount),
+    timestamp: tx.blockTime ? new Date(tx.blockTime * 1000) : new Date(),
+    currency: tx.currency
+  }))
+)
 
 function formatCurrency(val: number) {
   return '$' + val.toFixed(2)
