@@ -399,7 +399,7 @@ async function onPurchase() {
   <div class="mx-auto px-4 sm:px-6 lg:px-8 py-12 max-w-4xl">
     <div class="particles-container absolute inset-0 overflow-hidden pointer-events-none"></div>
 
-    <FoundersHeader />
+    <FoundersHeader class="animate__animated animate__fadeIn" />
 
     <FoundersStats
       :tokens-sold="TOKENS_SOLD"
@@ -407,6 +407,7 @@ async function onPurchase() {
       :sale-progress="SALE_PROGRESS"
       :formatted-token-price="formattedTokenPrice"
       :countdown="countdown"
+      class="animate__animated animate__fadeIn"
     />
 
     <FoundersPurchaseForm
@@ -434,7 +435,8 @@ async function onPurchase() {
     <FoundersRecentPurchases 
       :recent-purchases="recentPurchases" 
       :loading="historyLoading" 
-      :error-msg="historyError" 
+      :error-msg="historyError"
+      class="animate__animated animate__fadeIn" 
       @refresh="fetchTransactionHistory" 
     />
   </div>
