@@ -32,7 +32,7 @@
         Smart. Secure. Sustainable. Join the movement where crypto meets clean energy.
       </p>
       <div class="flex justify-center gap-6 mt-8">
-        <NuxtLink to="/presale" class="btn btn-primary btn-lg btn-glow-primary">Buy Now</NuxtLink>
+        <NuxtLink to="/founders" class="btn btn-primary btn-lg btn-glow-primary">Buy Now</NuxtLink>
         <NuxtLink to="/whitepaper" class="btn btn-secondary btn-lg">Learn More</NuxtLink>
       </div>
     </div>
