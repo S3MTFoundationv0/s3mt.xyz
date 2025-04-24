@@ -87,7 +87,10 @@ const { transactions, loading: historyLoading, errorMsg: historyError, fetchTran
 
 // Presale stats (would typically come from an API/contract)
 const PRESALE_ALLOCATION =  1_000_000_000 // Total tokens in presale
-const TOKENS_SOLD = computed(() => statsMetrics.value?.totalS3mtPurchased ?? 0) // Tokens sold so far, default to 0
+const TOKENS_SOLD = computed(() => {
+  const soldValue = Number(statsMetrics.value?.totalS3mtPurchased ?? 0);
+  return isNaN(soldValue) ? 0 : soldValue;
+})
 const SALE_PROGRESS = computed(() => {
   const sold = TOKENS_SOLD.value;
   const allocation = PRESALE_ALLOCATION;
@@ -445,7 +448,6 @@ async function onPurchase() {
       :recent-purchases="recentPurchases" 
       :loading="historyLoading" 
       :error-msg="historyError"
-      class="animate__animated animate__fadeIn animate__faster" 
       @refresh="fetchTransactionHistory" 
     />
   </div>
