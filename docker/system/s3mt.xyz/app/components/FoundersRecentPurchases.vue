@@ -36,8 +36,22 @@
   <div v-else-if="recentPurchases.length > 0" class="relative animate__animated animate__fadeIn animate__delay-4s">
     <div class="absolute inset-0 bg-gradient-to-br from-gray-800/20 via-gray-700/10 to-gray-800/20 rounded-xl blur opacity-30"></div>
     <div class="relative bg-gray-800/60 backdrop-blur-sm rounded-xl border border-gray-700/50 overflow-hidden shadow-lg">
-      <div class="p-4 border-b border-gray-700/70">
+      <div class="p-4 border-b border-gray-700/70 flex justify-between items-center">
         <h3 class="text-xl font-semibold text-white">Recent Purchases</h3>
+        <button 
+          @click="emitRefresh"
+          class="refresh-button"
+          :disabled="loading"
+        >
+          <svg v-if="loading" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          <span v-if="loading">Refreshing...</span>
+          <span v-else>Refresh</span>
+        </button>
       </div>
       <div class="divide-y divide-gray-700/50">
         <div v-for="(purchase, index) in recentPurchases" :key="index" class="p-4 hover:bg-gray-700/20 transition-colors duration-150">
@@ -84,12 +98,26 @@
     <div class="absolute inset-0 bg-gradient-to-br from-gray-800/20 via-gray-700/10 to-gray-800/20 rounded-xl blur opacity-30"></div>
     <div class="relative bg-gray-800/60 backdrop-blur-sm rounded-xl border border-gray-700/50 overflow-hidden shadow-lg p-8 text-center">
       <p class="text-gray-400">No purchase history available yet</p>
+      <button 
+        @click="emitRefresh"
+        class="refresh-button mt-4"
+        :disabled="loading"
+      >
+        <svg v-if="loading" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+        <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+        <span v-if="loading">Refreshing...</span>
+        <span v-else>Refresh</span>
+      </button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { defineProps } from 'vue'
+import { defineProps, defineEmits } from 'vue'
 
 const props = defineProps({
   recentPurchases: {
@@ -106,6 +134,12 @@ const props = defineProps({
   }
 })
 
+const emit = defineEmits(['refresh'])
+
+function emitRefresh() {
+  emit('refresh')
+}
+
 function timeAgo(date) {
   const seconds = Math.floor((Date.now() - new Date(date).getTime()) / 1000)
   let interval = seconds / 31536000
@@ -121,3 +155,29 @@ function timeAgo(date) {
   return Math.floor(seconds) + 's ago'
 }
 </script>
+
+<style scoped>
+.refresh-button {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: white;
+  background-color: rgba(79, 70, 229, 0.6);
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  backdrop-filter: blur(4px);
+}
+
+.refresh-button:hover:not(:disabled) {
+  background-color: rgba(67, 56, 202, 0.7);
+}
+
+.refresh-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+</style>
