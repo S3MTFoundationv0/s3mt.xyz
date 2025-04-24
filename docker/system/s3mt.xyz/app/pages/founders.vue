@@ -2,7 +2,7 @@
 import { useWallet, useAnchorWallet } from 'solana-wallets-vue'
 import { Connection, PublicKey, SystemProgram, SYSVAR_CLOCK_PUBKEY, LAMPORTS_PER_SOL } from '@solana/web3.js'
 import { AnchorProvider, Program, BN } from '@coral-xyz/anchor'
-import { getAssociatedTokenAddress, TOKEN_PROGRAM_ID } from '@solana/spl-token'
+import { getAssociatedTokenAddress, TOKEN_PROGRAM_ID, getAccount } from '@solana/spl-token'
 import presaleIdl from '~/programs/s3mt_presale.idl.json'
 
 useSWV()
@@ -21,6 +21,13 @@ const isFetchingPrice = ref(false);
 const PRICE = 0.10 // Price in USD
 const currency = ref('USDC')
 const amount = ref(0)
+
+// Wallet balances
+const walletBalances = ref({
+  sol: null as number | null,
+  usdc: null as number | null
+})
+const isFetchingBalances = ref(false)
 
 // Computed props for currency-specific calculations
 const totalCostInUsd = computed(() => PRICE * amount.value)
@@ -57,7 +64,7 @@ const formattedTokenPrice = computed(() => {
 const isValid = computed(() => amount.value > 0)
 
 // Wallet & UI state
-const { connected, publicKey } = useWallet()
+const { connected, publicKey, select: selectWallet, wallets } = useWallet()
 const wallet = useAnchorWallet()
 
 const loading = ref(false)
@@ -75,8 +82,6 @@ const treasuryAddress = config.public.treasury
 // Solana connection
 const connection = new Connection(rpcUrl, { commitment: 'confirmed' })
 
-
-
 // Recent purchases for social proof (fetched from blockchain via composable)
 const { transactions, loading: historyLoading, errorMsg: historyError, fetchTransactionHistory, statsMetrics } = useTransactionHistory()
 
@@ -90,21 +95,25 @@ const PRESALE_END_DATE = new Date('2024-07-25T23:59:59Z')
 const countdown = ref({ days: 0, hours: 0, minutes: 0, seconds: 0 })
 let countdownTimer: any = null
 
+// Define an interface for the transaction object structure if not already defined
+interface Transaction {
+  buyer?: string;
+  s3mtAmount: number | string;
+  blockTime?: number;
+  currency: string;
+}
+
 onMounted(() => {
   fetchTransactionHistory()
 })
 const recentPurchases = computed(() =>
-  transactions.value.slice(0, 5).map(tx => ({
+  transactions.value.slice(0, 5).map((tx: Transaction) => ({
     address: tx.buyer || '',
     amount: Number(tx.s3mtAmount),
     timestamp: tx.blockTime ? new Date(tx.blockTime * 1000) : new Date(),
     currency: tx.currency
   }))
 )
-
-function formatCurrency(val: number) {
-  return '$' + val.toFixed(2)
-}
 
 const fixIdlPublicKeys = (idl: any) => {
   // First ensure IDL has a metadata.address field that's a valid PublicKey string
@@ -204,6 +213,54 @@ watch(currency, (newCurrency: 'USDC' | 'SOL') => {
   }
 });
 
+// Function to fetch wallet balances
+async function fetchWalletBalances() {
+  if (!connected.value || !publicKey.value) {
+    walletBalances.value = { sol: null, usdc: null };
+    return;
+  }
+
+  isFetchingBalances.value = true;
+  
+  try {
+    // Fetch SOL balance
+    const solBalance = await connection.getBalance(publicKey.value);
+    walletBalances.value.sol = solBalance;
+    
+    // Fetch USDC balance
+    try {
+      const usdcMint = new PublicKey(usdcMintAddress);
+      const usdcTokenAccount = await getAssociatedTokenAddress(
+        usdcMint,
+        publicKey.value
+      );
+      
+      try {
+        const accountInfo = await getAccount(connection, usdcTokenAccount);
+        walletBalances.value.usdc = Number(accountInfo.amount);
+      } catch (error) {
+        // Token account might not exist yet
+        console.log("USDC account not found or has no balance");
+        walletBalances.value.usdc = 0;
+      }
+    } catch (error) {
+      console.error("Error fetching USDC balance:", error);
+      walletBalances.value.usdc = 0;
+    }
+  } catch (error) {
+    console.error("Error fetching wallet balances:", error);
+  } finally {
+    isFetchingBalances.value = false;
+  }
+}
+
+// Watch for wallet connection status changes
+watch(connected, async (isConnected: boolean) => {
+  if (isConnected && publicKey.value) {
+    await fetchWalletBalances();
+  }
+})
+
 // Lifecycle hooks
 onMounted(() => {
   updateCountdown()
@@ -218,6 +275,11 @@ onMounted(() => {
       fetchSolPrice()
     }
   }, 30000) // Every 30 seconds
+  
+  // Fetch wallet balances if wallet is already connected
+  if (connected.value && publicKey.value) {
+    fetchWalletBalances()
+  }
   
   // Clean up interval on component unmount
   onUnmounted(() => {
@@ -305,6 +367,13 @@ async function onPurchase() {
     }
 
     success.value = true
+    
+    // Refresh balances after successful purchase
+    fetchWalletBalances()
+    
+    // Also refresh transaction history
+    fetchTransactionHistory()
+    
   } catch (err) {
     console.error(err)
     errorMsg.value = err instanceof Error ? err.message : String(err)
@@ -336,14 +405,17 @@ async function onPurchase() {
       :formatted-total-cost="formattedTotalCost"
       :formatted-token-price="formattedTokenPrice"
       :total-cost-in-usd="totalCostInUsd"
+      :total-cost="totalCost"
       :connected="connected"
       :loading="loading"
       :success="success"
       :error-msg="errorMsg"
       :transaction-signature="transactionSignature"
+      :wallet-balances="walletBalances"
       @update:currency="currency = $event"
       @update:amount="amount = $event"
       @purchase="onPurchase"
+      @fetch-balances="fetchWalletBalances"
     />
 
     <FoundersRecentPurchases 
