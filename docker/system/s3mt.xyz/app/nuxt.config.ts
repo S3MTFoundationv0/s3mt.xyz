@@ -23,7 +23,7 @@ export default defineNuxtConfig({
       presaleProgramId: process.env.PRESALE_PROGRAM_ID || '5tz5xFvHNnJViiCZ3iHdgqrTC1GfcEvnB49KoxvQpR3D',
       usdcMint: process.env.USDC_MINT || 'HfED8AJT8pZvAzsGLV6FdYt5W6SLekbimgV8yS9LNcfW',
       treasury: process.env.TREASURY || '3vgJTkBPHGh7qK87CcouAxvvJnu95LRLKC9tNmz2XyGj',
-      presaleEndDate: new Date(process.env.PRESALE_END_DATE) || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()), // 30 days from now by default
+      presaleEndDate: new Date(process.env.PRESALE_END_DATE).toISOString() || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now by default
       motion: {
         directives: {
           // your motion directives if any
