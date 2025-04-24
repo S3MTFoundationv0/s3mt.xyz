@@ -233,7 +233,7 @@ export function useTransactionHistory() {
     
     return {
       totalTransactions,
-      totalS3mtPurchased: totalS3mtPurchased.toLocaleString(),
+      totalS3mtPurchased: totalS3mtPurchased,
       totalSolSpent,
       totalUsdcSpent,
       avgPurchaseSize,
