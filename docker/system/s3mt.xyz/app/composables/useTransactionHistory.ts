@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRuntimeConfig } from '#app'
 import { Connection, PublicKey, LAMPORTS_PER_SOL, Message, VersionedMessage } from '@solana/web3.js'
 import { AnchorProvider, Program, BN } from '@coral-xyz/anchor'
@@ -20,6 +20,9 @@ export function useTransactionHistory() {
   const transactions = ref<ParsedTransaction[]>([])
   const loading = ref(false)
   const errorMsg = ref('')
+  const refreshIntervalId = ref<NodeJS.Timeout | null>(null)
+
+  const REFRESH_INTERVAL_MS = 60000 // 1 minute
 
   const config = useRuntimeConfig()
   const rpcUrl = config.public.solanaNetwork
@@ -156,6 +159,25 @@ export function useTransactionHistory() {
     }
   }
 
+  const startAutoRefresh = () => {
+    if (refreshIntervalId.value) return // Already running
+    fetchTransactionHistory() // Fetch immediately on start
+    refreshIntervalId.value = setInterval(fetchTransactionHistory, REFRESH_INTERVAL_MS)
+  }
+
+  const stopAutoRefresh = () => {
+    if (refreshIntervalId.value) {
+      clearInterval(refreshIntervalId.value)
+      refreshIntervalId.value = null
+    }
+  }
+
+  // Start refreshing when the composable is mounted
+  onMounted(startAutoRefresh)
+
+  // Stop refreshing when the composable is unmounted
+  onUnmounted(stopAutoRefresh)
+
   const statsMetrics = computed(() => {
     const fetchedTransactions = transactions.value;
     
@@ -224,6 +246,8 @@ export function useTransactionHistory() {
     loading,
     errorMsg,
     fetchTransactionHistory,
-    statsMetrics
+    statsMetrics,
+    startAutoRefresh,
+    stopAutoRefresh
   }
 }

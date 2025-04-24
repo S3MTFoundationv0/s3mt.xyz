@@ -169,28 +169,6 @@ function updateCountdown() {
   countdown.value = { days, hours, minutes, seconds }
 }
 
-// Format timestamp to a relative time string
-function timeAgo(date: Date): string {
-  const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
-  
-  let interval = seconds / 31536000;
-  if (interval > 1) return Math.floor(interval) + "y ago";
-  
-  interval = seconds / 2592000;
-  if (interval > 1) return Math.floor(interval) + "mo ago";
-  
-  interval = seconds / 86400;
-  if (interval > 1) return Math.floor(interval) + "d ago";
-  
-  interval = seconds / 3600;
-  if (interval > 1) return Math.floor(interval) + "h ago";
-  
-  interval = seconds / 60;
-  if (interval > 1) return Math.floor(interval) + "m ago";
-  
-  return Math.floor(seconds) + "s ago";
-}
-
 // Mock function to fetch SOL price from an oracle
 async function fetchSolPrice() {
   try {
@@ -368,7 +346,12 @@ async function onPurchase() {
       @purchase="onPurchase"
     />
 
-    <FoundersRecentPurchases :recent-purchases="recentPurchases" :loading="historyLoading" :error-msg="historyError" />
+    <FoundersRecentPurchases 
+      :recent-purchases="recentPurchases" 
+      :loading="historyLoading" 
+      :error-msg="historyError" 
+      @refresh="fetchTransactionHistory" 
+    />
   </div>
 </template>
 
