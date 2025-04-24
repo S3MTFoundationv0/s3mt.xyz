@@ -1,5 +1,5 @@
 <template>
-  <div id="invest" class="relative mb-8 animate__animated animate__fadeIn animate__delay-3s">
+  <div id="invest" class="relative mb-8 animate__animated animate__fadeIn">
     <!-- Background Gradient Effect -->
     <div class="absolute inset-0 bg-gradient-to-br from-indigo-600/20 via-purple-500/20 to-indigo-700/20 rounded-xl blur-xl opacity-30"></div>
 
