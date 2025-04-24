@@ -64,7 +64,7 @@ const formattedTokenPrice = computed(() => {
 const isValid = computed(() => amount.value > 0)
 
 // Wallet & UI state
-const { connected, publicKey, select: selectWallet, wallets } = useWallet()
+const { connected, publicKey } = useWallet()
 const wallet = useAnchorWallet()
 
 const loading = ref(false)
@@ -91,7 +91,7 @@ const TOKENS_SOLD = computed(() => statsMetrics.value.totalS3mtPurchased) // Tok
 const SALE_PROGRESS = computed(() => Math.min(100, (TOKENS_SOLD.value / PRESALE_ALLOCATION) * 100))
 
 // End date for the presale
-const PRESALE_END_DATE = new Date('2024-07-25T23:59:59Z')
+const PRESALE_END_DATE = new Date(config.public.presaleEndDate)
 const countdown = ref({ days: 0, hours: 0, minutes: 0, seconds: 0 })
 let countdownTimer: any = null
 
