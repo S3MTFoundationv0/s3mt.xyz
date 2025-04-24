@@ -155,10 +155,74 @@ export function useTransactionHistory() {
     }
   }
 
+  const statsMetrics = computed(() => {
+    const fetchedTransactions = transactions.value;
+    
+    // Total number of transactions
+    const totalTransactions = fetchedTransactions.length;
+    
+    // Total S3MT tokens purchased
+    const totalS3mtPurchased = fetchedTransactions.reduce((total, tx) => {
+      if (tx.s3mtAmount && tx.s3mtAmount !== 'N/A') {
+        // Try to parse the s3mtAmount
+        try {
+          return total + Number(tx.s3mtAmount);
+        } catch (e) {
+          return total;
+        }
+      }
+      return total;
+    }, 0);
+    
+    // Total spent in each currency
+    const totalSpentByType = fetchedTransactions.reduce((acc, tx) => {
+      if (tx.cost && tx.cost !== 'N/A' && tx.currency) {
+        try {
+          const cost = Number(tx.cost);
+          acc[tx.currency] = (acc[tx.currency] || 0) + cost;
+        } catch (e) {
+          // Skip if we can't parse the cost
+        }
+      }
+      return acc;
+    }, {} as Record<string, number>);
+    
+    // Calculate average purchase size
+    const avgPurchaseSize = totalTransactions > 0 
+      ? (totalS3mtPurchased / totalTransactions).toFixed(2) 
+      : '0';
+    
+    // Format the SOL and USDC totals nicely
+    const totalSolSpent = totalSpentByType['SOL'] ? totalSpentByType['SOL'].toFixed(4) : '0';
+    const totalUsdcSpent = totalSpentByType['USDC'] ? totalSpentByType['USDC'].toFixed(2) : '0';
+      
+    // Recent activity - count transactions in last 24 hours
+    const last24HoursCount = fetchedTransactions.filter(tx => {
+      if (tx.blockTime) {
+        const txTime = new Date(tx.blockTime * 1000);
+        const now = new Date();
+        const diffMs = now.getTime() - txTime.getTime();
+        const diffHours = diffMs / (1000 * 60 * 60);
+        return diffHours <= 24;
+      }
+      return false;
+    }).length;
+    
+    return {
+      totalTransactions,
+      totalS3mtPurchased: totalS3mtPurchased.toLocaleString(),
+      totalSolSpent,
+      totalUsdcSpent,
+      avgPurchaseSize,
+      last24HoursCount
+    };
+  });
+
   return {
     transactions,
     loading,
     errorMsg,
-    fetchTransactionHistory
+    fetchTransactionHistory,
+    statsMetrics
   }
 }

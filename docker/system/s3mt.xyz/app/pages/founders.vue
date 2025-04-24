@@ -75,9 +75,14 @@ const treasuryAddress = config.public.treasury
 // Solana connection
 const connection = new Connection(rpcUrl, { commitment: 'confirmed' })
 
+
+
+// Recent purchases for social proof (fetched from blockchain via composable)
+const { transactions, loading: historyLoading, errorMsg: historyError, fetchTransactionHistory, statsMetrics } = useTransactionHistory()
+
 // Presale stats (would typically come from an API/contract)
-const PRESALE_ALLOCATION = 1000000 // Total tokens in presale
-const TOKENS_SOLD = ref(427650) // Tokens sold so far
+const PRESALE_ALLOCATION =  1_000_000_000 // Total tokens in presale
+const TOKENS_SOLD = computed(() => statsMetrics.value.totalS3mtPurchased) // Tokens sold so far
 const SALE_PROGRESS = computed(() => Math.min(100, (TOKENS_SOLD.value / PRESALE_ALLOCATION) * 100))
 
 // End date for the presale
@@ -85,8 +90,6 @@ const PRESALE_END_DATE = new Date('2024-07-25T23:59:59Z')
 const countdown = ref({ days: 0, hours: 0, minutes: 0, seconds: 0 })
 let countdownTimer: any = null
 
-// Recent purchases for social proof (fetched from blockchain via composable)
-const { transactions, loading: historyLoading, errorMsg: historyError, fetchTransactionHistory } = useTransactionHistory()
 onMounted(() => {
   fetchTransactionHistory()
 })
