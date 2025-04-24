@@ -37,18 +37,13 @@
       </div>
     </div>
 
-    <!-- Remove Partners from here -->
-    <!-- 
-    <div class="relative z-10 flex flex-col justify-center items-center h-full text-center px-4">
+    <!-- New Section for Partners -->
+    <section class="bg-base-200 py-20">
       <Partners />
-    </div>
-    -->
+    </section>
   </section>
 
-  <!-- New Section for Partners -->
-  <section class="bg-base-200 py-20">
-    <Partners />
-  </section>
+  
   
 </template>
 
