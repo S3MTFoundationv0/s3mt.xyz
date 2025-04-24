@@ -6,13 +6,13 @@
       <div class="relative z-10">
         <h3 class="text-sm font-medium text-gray-400 mb-1">Presale Progress</h3>
         <div class="flex justify-between mb-2">
-          <span class="text-white font-bold">{{ tokensSold.toLocaleString() }}</span>
-          <span class="text-gray-400">{{ presaleAllocation.toLocaleString() }}</span>
+          <span class="text-white font-bold">{{ (typeof tokensSold === 'number' && !isNaN(tokensSold)) ? tokensSold.toLocaleString() : '0' }}</span>
+          <span class="text-gray-400">{{ (typeof presaleAllocation === 'number' && !isNaN(presaleAllocation)) ? presaleAllocation.toLocaleString() : '0' }}</span>
         </div>
         <div class="w-full bg-gray-700 rounded-full h-2.5 mb-1">
           <div class="h-2.5 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600" :style="`width: ${saleProgress}%`"></div>
         </div>
-        <div class="text-xs text-right text-gray-400">{{ saleProgress.toFixed(1) }}% sold</div>
+        <div class="text-xs text-right text-gray-400">{{ (typeof saleProgress === 'number' && !isNaN(saleProgress)) ? saleProgress.toFixed(1) : '0.0' }}% sold</div>
       </div>
     </div>
 
@@ -22,7 +22,7 @@
       <div class="relative z-10">
         <h3 class="text-sm font-medium text-gray-400 mb-1">Token Price</h3>
         <div class="flex items-center">
-          <span class="text-2xl font-bold text-white">{{ formattedTokenPrice }}</span>
+          <span class="text-2xl font-bold text-white">{{ formattedTokenPrice || 'N/A' }}</span>
         </div>
         <p class="text-green-400 text-xs mt-1">50% discount from public sale</p>
       </div>
