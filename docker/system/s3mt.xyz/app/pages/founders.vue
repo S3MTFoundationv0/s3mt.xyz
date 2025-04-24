@@ -368,7 +368,7 @@ async function onPurchase() {
       @purchase="onPurchase"
     />
 
-    <FoundersRecentPurchases :recent-purchases="recentPurchases" />
+    <FoundersRecentPurchases :recent-purchases="recentPurchases" :loading="historyLoading" :error-msg="historyError" />
   </div>
 </template>
 
