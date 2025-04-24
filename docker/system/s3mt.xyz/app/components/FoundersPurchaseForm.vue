@@ -290,7 +290,7 @@ watch(() => props.walletBalances, (newBalances) => {
     balances.value = { ...newBalances }
     isLoadingBalances.value = false
   }
-})
+}, { immediate: true })
 
 // Watch for currency changes to fetch the right balance
 watch(() => props.currency, () => {
@@ -314,9 +314,17 @@ function purchase() {
 }
 
 function fetchBalances() {
-  isLoadingBalances.value = true
+  isLoadingBalances.value = true;
   // This event will be handled by the parent component to fetch wallet balances
-  emit('fetch-balances')
+  emit('fetch-balances');
+  
+  // Safety timeout to prevent infinite loading state
+  setTimeout(() => {
+    if (isLoadingBalances.value) {
+      console.log('Balance fetch timeout - resetting loading state');
+      isLoadingBalances.value = false;
+    }
+  }, 5000); // 5 second timeout
 }
 
 function formatBalance(balance: number | null, type: 'SOL' | 'USDC') {
