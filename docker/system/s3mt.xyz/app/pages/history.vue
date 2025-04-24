@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
 import { useWallet } from 'solana-wallets-vue'
-import { Connection, PublicKey, LAMPORTS_PER_SOL, type TransactionInstruction, type CompiledInstruction, Message, VersionedMessage, type AccountMeta } from '@solana/web3.js'
+import { Connection, PublicKey, LAMPORTS_PER_SOL, Message, VersionedMessage } from '@solana/web3.js'
 import { AnchorProvider, Program, BN, type Idl } from '@coral-xyz/anchor' // Import Anchor items
 import presaleIdl from '~/programs/s3mt_presale.idl.json' // Import the IDL
 import { Buffer } from 'buffer' // Import Buffer
@@ -27,9 +26,9 @@ interface ParsedTransaction {
 
 // Wallet & UI state
 const { connected, publicKey } = useWallet()
-const loading = ref(false)
-const errorMsg = ref('')
-const fetchedTransactions = ref<ParsedTransaction[]>([])
+// Transaction history composable
+const { transactions: fetchedTransactions, loading, errorMsg, fetchTransactionHistory } = useTransactionHistory()
+onMounted(() => fetchTransactionHistory())
 
 // Create computed property for display
 const displayTransactions = computed(() => {
@@ -167,7 +166,7 @@ async function fetchAndParseTransactions() {
            processedInstructions = msgLegacy.instructions.map(ix => ({
              programIdIndex: ix.programIdIndex,
              // Map pubkeys back to indices in the legacy accountKeys array - Fix cast
-             accounts: ix.accounts.map(accMeta => accountKeys.findIndex(key => key.equals((accMeta as unknown as AccountMeta).pubkey))),
+             accounts: ix.accounts.map(accMeta => accountKeys.findIndex(key => key.equals((accMeta as unknown).pubkey))),
              data: ix.data // data is Buffer here
            }));
         }
