@@ -133,19 +133,20 @@ export function useTransactionHistory() {
                 pd.s3mtAmount = s3
                 pd.cost = usdc.toFixed(6)
                 pd.currency = 'USDC'
+                parsed.push(pd)
               } else if (decoded.name === 'purchaseSol') {
                 const s3 = (decoded.data.s3MtAmount as BN).toString()
                 const sol = (decoded.data.solAmount as BN).toNumber() / LAMPORTS_PER_SOL
                 pd.s3mtAmount = s3
                 pd.cost = sol.toFixed(9)
                 pd.currency = 'SOL'
+                parsed.push(pd)
               }
             }
           }
         } catch (e) {
           console.error('Parse error', e)
         }
-        parsed.push(pd)
       }
       transactions.value = parsed
     } catch (err: any) {
