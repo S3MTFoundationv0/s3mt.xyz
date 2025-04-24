@@ -221,11 +221,19 @@ async function fetchWalletBalances() {
   }
 
   isFetchingBalances.value = true;
+  console.log('Fetching wallet balances...');
   
   try {
+    // Create a fresh object to ensure reactivity
+    const newBalances = { 
+      sol: null as number | null, 
+      usdc: null as number | null 
+    };
+    
     // Fetch SOL balance
     const solBalance = await connection.getBalance(publicKey.value);
-    walletBalances.value.sol = solBalance;
+    newBalances.sol = solBalance;
+    console.log('SOL balance:', solBalance / LAMPORTS_PER_SOL);
     
     // Fetch USDC balance
     try {
@@ -237,18 +245,23 @@ async function fetchWalletBalances() {
       
       try {
         const accountInfo = await getAccount(connection, usdcTokenAccount);
-        walletBalances.value.usdc = Number(accountInfo.amount);
+        newBalances.usdc = Number(accountInfo.amount);
+        console.log('USDC balance:', newBalances.usdc / 1000000);
       } catch (error) {
         // Token account might not exist yet
         console.log("USDC account not found or has no balance");
-        walletBalances.value.usdc = 0;
+        newBalances.usdc = 0;
       }
     } catch (error) {
       console.error("Error fetching USDC balance:", error);
-      walletBalances.value.usdc = 0;
+      newBalances.usdc = 0;
     }
+    
+    // Update the reactive state with the new object to ensure Vue detects the change
+    walletBalances.value = newBalances;
   } catch (error) {
     console.error("Error fetching wallet balances:", error);
+    walletBalances.value = { sol: 0, usdc: 0 };
   } finally {
     isFetchingBalances.value = false;
   }
