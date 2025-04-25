@@ -35,10 +35,10 @@
           <p class="mb-6 text-lg leading-relaxed">The S3MT Treasury allocates collected funds into tangible, income-generating assets focused on sustainability:</p>
           
           <h3 class="text-2xl font-semibold mb-3 mt-6 text-indigo-300">Sustainable Bitcoin Mining</h3>
-          <p class="mb-4 text-lg leading-relaxed">S3MT prioritizes Bitcoin mining operations that predominantly utilize renewable and clean energy sources, such as partnerships with clean energy providers (e.g., leveraging palm oil operations in Guatemala). The S3MT DAO acquires shares in public and private mining operations demonstrating positive EBITDA and favorable yields. All proceeds, yields, and other income generated are distributed directly to S3MT token holders via the network.</p>
+          <p class="mb-4 text-lg leading-relaxed">S3MT prioritizes Bitcoin mining hashrate, products, and operations that predominantly utilize renewable and clean energy sources, such as partnerships with clean energy providers. For example leveraging biogas from palm oil operations in Guatemala, cleaning up pollution to generate electricity. The S3MT DAO acquires shares in public and private mining operations, hashrate & defi products, demonstrating positive EBITDA and favorable yields. All proceeds, yields, and other income generated are distributed directly to S3MT token holders via the network.</p>
           
           <h3 class="text-2xl font-semibold mb-3 mt-6 text-indigo-300">Sustainable Mineral Mining</h3>
-          <p class="mb-4 text-lg leading-relaxed">S3MT takes an innovative approach to mineral assets. Instead of physical extraction, we focus on tokenizing certified mineral reserves, keeping the vast majority (99%) of the minerals securely in the ground. World-renowned geologists provide certifications, which are immutably recorded on the blockchain alongside share purchase agreements detailing sustainability commitments and purchasing thresholds. S3MT purchases shares in mines, bullion, certificates, and related instruments, with all transactions transparently recorded on the blockchain. While preserving resources, S3MT also supports genuinely sustainable traditional mining efforts by local and indigenous communities in Latin America and Africa. Yields from asset management and any sustainable extraction efforts are distributed to token holders through the S3MT network.</p>
+          <p class="mb-4 text-lg leading-relaxed">S3MT takes an innovative approach to mineral assets. Instead of physical extraction, we focus on tokenizing certified mineral reserves, keeping the vast majority (99%) of the minerals securely in the ground. World-renowned geologists provide certifications, which are immutably recorded on the blockchain alongside share purchase agreements detailing sustainability commitments and purchasing thresholds. S3MT acquires and tokenizes shares in mines, bullion, certificates, and related instruments, with all transactions transparently recorded on the blockchain. While preserving resources, S3MT also supports genuinely sustainable traditional mining efforts by local and indigenous communities in Latin America and Africa. Yields from asset management and any sustainable extraction efforts are distributed to token holders through the S3MT network.</p>
         </WhitepaperSection>
 
         <SectionDivider />
@@ -51,7 +51,7 @@
           </template>
           
           <p class="mb-6 text-lg leading-relaxed">
-            The S3MT token is designed with a fixed total supply of <strong>1,000,000,000 S3MT</strong>. This supply powers sustainable Bitcoin mining operations and rewards long-term holders through yield distribution, staking incentives, and periodic token burn cycles. The token price will ultimately be determined by market forces, but the initial structure ensures a sustainable ecosystem.
+            The S3MT token is designed with a fixed initial supply of <strong>1,000,000,000 S3MT</strong> tokens on the Solana Blockchain. Any additional minted tokens will be voted on by token holders through a token-based DAO voting process. The supply powers sustainable Bitcoin mining operations and rewards long-term holders through yield distribution, staking incentives, and periodic token burn cycles. The token price will ultimately be determined by market forces, but the initial structure ensures a sustainable ecosystem and launch on CEX and DEX platforms.
           </p>
           
           <h3 class="text-2xl font-semibold mb-3 mt-6 text-indigo-300">Total Supply Allocation</h3>
@@ -75,7 +75,7 @@
           </ul>
           <p class="mb-6 text-lg leading-relaxed">This 80/20 split ensures the majority of tokens are available to the community while providing dedicated resources for development, operations, marketing, and rewarding key contributors like founders.</p>
 
-          <h3 class="text-2xl font-semibold mb-3 mt-6 text-indigo-300">Initial Minting Example (Post-Launch)</h3>
+          <h3 class="text-2xl font-semibold mb-3 mt-6 text-indigo-300">Minting Process (Post-Launch)</h3>
           <p class="mb-4 text-lg leading-relaxed">During the post-launch phase, tokens are initially priced at $0.10 each. The minting process works as follows:</p>
           <ul class="list-disc ml-6 space-y-2 mb-4 text-lg">
               <li>A buyer sends 10 USDC (or equivalent stablecoin) to the designated contract address.</li>
