@@ -8,6 +8,8 @@ useHead({
   meta: [{ name: 'description', content: 'View presale transaction history.' }]
 })
 
+useSWV()
+
 const { connected, publicKey } = useWallet()
 const { transactions, loading, errorMsg, statsMetrics, fetchTransactionHistory } = useTransactionHistory()
 
