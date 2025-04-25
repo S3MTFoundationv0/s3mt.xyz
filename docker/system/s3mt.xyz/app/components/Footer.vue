@@ -8,8 +8,7 @@
         </div>
         <div class="flex space-x-6">
           <NuxtLink to="/" class="hover:text-white text-sm">Home</NuxtLink>
-          <NuxtLink to="/presale" class="hover:text-white text-sm">Presale</NuxtLink>
-          <NuxtLink to="/swap" class="hover:text-white text-sm">Swap</NuxtLink>
+          <NuxtLink to="/founders" class="hover:text-white text-sm">Founders</NuxtLink>
           <NuxtLink to="/whitepaper" class="hover:text-white text-sm">Whitepaper</NuxtLink>
           <!-- Add other important links here, e.g., Terms, Privacy Policy -->
         </div>
