@@ -1,3 +1,5 @@
+import { resolve } from 'path'
+
 export default defineNuxtConfig({
   modules: ['@nuxtjs/tailwindcss', '@vueuse/motion/nuxt'],
 
@@ -64,7 +66,8 @@ export default defineNuxtConfig({
     resolve: {
       alias: {
         buffer: 'buffer/',
-        '@coral-xyz/anchor': '@coral-xyz/anchor/dist/browser/index.js'
+        '@coral-xyz/anchor': '@coral-xyz/anchor/dist/browser/index.js',
+        //'jayson/lib/client/browser': resolve(__dirname, 'node_modules/jayson/lib/client/browser/index.js')
       }
     },
     // Ensure browser environment
@@ -73,5 +76,11 @@ export default defineNuxtConfig({
     }
   },
 
+  nitro: {
+    alias: {
+      'jayson/lib/client/browser/index.js': resolve(__dirname, 'node_modules/jayson/lib/client/browser/index.js'),
+      'jayson/lib/client/browser': resolve(__dirname, 'node_modules/jayson/lib/client/browser/index.js')
+    }
+  },
   compatibilityDate: '2025-04-02',
 })
