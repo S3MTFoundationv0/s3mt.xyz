@@ -57,7 +57,8 @@ _configureHAProxy() {
 
 _main() {
   export NUXT_NUM_PROCS=${NUXT_NUM_PROCS:-$([[ "$CANONICAL_URL" =~ "localhost" ]] && echo 1 || echo 4)}
-  export NUXT_COMMAND=${NUXT_COMMAND:-$([[ "$CANONICAL_URL" =~ "localhost" ]] && echo "/usr/local/bin/server -s nuxt -D" || echo "/usr/local/bin/server -s nuxt")}
+  #export NUXT_COMMAND=${NUXT_COMMAND:-$([[ "$CANONICAL_URL" =~ "localhost" ]] && echo "/usr/local/bin/server -s nuxt -D" || echo "/usr/local/bin/server -s nuxt")}
+  export NUXT_COMMAND="/usr/local/bin/server -s nuxt -D"
   
 
   _setupLogs nuxt $NUXT_NUM_PROCS
