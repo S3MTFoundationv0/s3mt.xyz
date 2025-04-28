@@ -14,3 +14,5 @@ get_tag = $(if $(tag),$(tag),$(if $(t),$(t),'latest'))
 
 # Helper function to optionally get the type parameter
 get_type = $(if $(type),$(type),$(if $(T),$(T),'base'))
+
+get_ha_proxy_file = $(if $(hap),$(hap), $(if $(H),$(H),'haproxy_prod.cfg'))

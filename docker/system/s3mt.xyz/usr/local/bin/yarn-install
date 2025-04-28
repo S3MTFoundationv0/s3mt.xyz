@@ -24,6 +24,7 @@ install_dependencies() {
   chown nobody:nobody .
   sudo -u nobody -g nobody UV_THREADPOOL_SIZE=64 NODE_ENV=development yarn install --force --network-timeout=99999
   cp $PACKAGE_JSON $PACKAGE_JSON_OLD
+  chown -R nobody:nobody .
   sudo -u nobody -g nobody touch yarn-error.log
 }
 
@@ -44,7 +45,11 @@ while getopts "f:b" opt; do
     ;;
   b)
     rm -rf .nuxt
+    rm -rf .output
     yarn build
+    chown -R nobody:nobody .
+    chown -R nobody:nobody .output
+    chown -R nobody:nobody .nuxt
     ;;
   *)
     usage

@@ -1,4 +1,7 @@
+import { resolve } from 'path'
+
 export default defineNuxtConfig({
+  ssr: false,
   modules: ['@nuxtjs/tailwindcss', '@vueuse/motion/nuxt'],
 
   app: {
@@ -34,10 +37,7 @@ export default defineNuxtConfig({
 
   build: {
     transpile: [
-      '@solana/wallet-adapter-base',
-      '@solana/wallet-adapter-wallets',
-      'solana-wallets-vue',
-      '@solana/wallet-adapter-vue'
+      'solana-wallets-vue'
     ]
   },
 
@@ -64,7 +64,8 @@ export default defineNuxtConfig({
     resolve: {
       alias: {
         buffer: 'buffer/',
-        '@coral-xyz/anchor': '@coral-xyz/anchor/dist/browser/index.js'
+        '@coral-xyz/anchor': '@coral-xyz/anchor/dist/browser/index.js',
+        //'jayson/lib/client/browser': resolve(__dirname, 'node_modules/jayson/lib/client/browser/index.js')
       }
     },
     // Ensure browser environment
@@ -73,5 +74,11 @@ export default defineNuxtConfig({
     }
   },
 
+  nitro: {
+    alias: {
+      'jayson/lib/client/browser/index.js': resolve(__dirname, 'node_modules/jayson/lib/client/browser/index.js'),
+      'jayson/lib/client/browser': resolve(__dirname, 'node_modules/jayson/lib/client/browser/index.js')
+    }
+  },
   compatibilityDate: '2025-04-02',
 })

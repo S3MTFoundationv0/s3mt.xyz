@@ -10,6 +10,7 @@ include make/logs.mk
 include make/pull.mk
 include make/reboot.mk
 include make/rebuild.mk
+include make/recopy.mk
 include make/restart.mk
 include make/run.mk
 include make/sh.mk

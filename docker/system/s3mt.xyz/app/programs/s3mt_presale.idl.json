@@ -416,6 +416,12 @@
           "type": {
             "option": "bool"
           }
+        },
+        {
+          "name": "usdc_mint",
+          "type": {
+            "option": "pubkey"
+          }
         }
       ]
     }
