@@ -1,6 +1,7 @@
 import { resolve } from 'path'
 
 export default defineNuxtConfig({
+  ssr: false,
   modules: ['@nuxtjs/tailwindcss', '@vueuse/motion/nuxt'],
 
   app: {
