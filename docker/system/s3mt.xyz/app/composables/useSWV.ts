@@ -1,9 +1,7 @@
-import { initWallet } from "solana-wallets-vue";
-
-const walletOptions = {
-  autoConnect: true,
-};
+import { initWallet } from 'solana-wallets-vue'
 
 export const useSWV = () => {
-  initWallet(walletOptions);
+  initWallet({
+    autoConnect: true,
+  });
 }
