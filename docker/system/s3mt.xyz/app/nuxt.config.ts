@@ -37,10 +37,7 @@ export default defineNuxtConfig({
 
   build: {
     transpile: [
-      '@solana/wallet-adapter-base',
-      '@solana/wallet-adapter-wallets',
-      'solana-wallets-vue',
-      '@solana/wallet-adapter-vue'
+      'solana-wallets-vue'
     ]
   },
 
