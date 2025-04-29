@@ -1,7 +1,7 @@
 services:
   validator:
-    container_name: s3mt-foundation-validator
-    image: ghcr.io/s3mtfoundation/validator:${VALIDATOR_IMAGE_TAG:-latest}
+    container_name: ${ORGANIZATION}-validator
+    image: ghcr.io/${ORGANIZATION}/validator:${VALIDATOR_IMAGE_TAG:-latest}
     restart: unless-stopped
     ports:
       - "8899:8899"  # Expose RPC port directly

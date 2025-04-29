@@ -50,7 +50,7 @@ jobs:
       - name: Run make build
         run: |
           source docker/compose/.env
-          make build s=traefik
+          make build s=traefik t=latest
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
