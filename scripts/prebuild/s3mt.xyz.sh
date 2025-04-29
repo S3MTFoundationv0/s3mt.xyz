@@ -1,11 +1,17 @@
 #!/bin/bash
 
-if [ -z "$FULLCHAIN_TLS" ]; then
-    echo "FULLCHAIN is not set. Skipping SSL certificate setup."
-    exit 0
+if [! -z "$FULLCHAIN_TLS" ]; then
+    echo "FULLCHAIN is set. Setting up SSL certificate."
+    mkdir -p docker/system/s3mt.xyz/etc/ssl/
+    echo "$FULLCHAIN_TLS" | base64 --decode > docker/system/s3mt.xyz/etc/ssl/beta.s3mt.xyz.fullchain.pem
 fi
 
-mkdir -p docker/system/s3mt.xyz/etc/ssl/
 
-echo "$FULLCHAIN_TLS" | base64 --decode > docker/system/s3mt.xyz/etc/ssl/s3mt.xyz.fullchain.pem
+
+if [! -z "$FULLCHAIN_TLS_PROD" ]; then
+    echo "FULLCHAIN_PROD is set. Setting up SSL certificate."
+    mkdir -p docker/system/s3mt.xyz/etc/ssl/
+    echo "$FULLCHAIN_TLS_PROD" | base64 --decode > docker/system/s3mt.xyz/etc/ssl/s3mt.xyz.fullchain.pem
+fi
+
 
