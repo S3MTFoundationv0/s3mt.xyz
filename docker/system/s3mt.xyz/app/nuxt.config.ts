@@ -1,7 +1,6 @@
 import { resolve } from 'path'
 
 export default defineNuxtConfig({
-  ssr: false,
   modules: ['@nuxtjs/tailwindcss', '@vueuse/motion/nuxt'],
 
   app: {
@@ -37,7 +36,10 @@ export default defineNuxtConfig({
 
   build: {
     transpile: [
-      'solana-wallets-vue'
+      '@solana/wallet-adapter-base',
+      '@solana/wallet-adapter-wallets',
+      'solana-wallets-vue',
+      '@solana/wallet-adapter-vue'
     ]
   },
 
