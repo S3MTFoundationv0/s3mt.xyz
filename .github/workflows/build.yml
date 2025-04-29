@@ -31,6 +31,7 @@ jobs:
           make build s=${PROJECT} t=latest
         env:
           FULLCHAIN_TLS: ${{ secrets.FULLCHAIN_TLS }}
+          FULLCHAIN_TLS_PROD: ${{ secrets.FULLCHAIN_TLS_PROD }}
 
       - name: Push Docker image
         run: |
