@@ -28,7 +28,8 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "solana-wallets-vue": "0.7.1",
-    "vue": "^3.4.21"
+    "vue": "^3.4.21",
+    "tweetnacl": "^1.0.3"
   },
   "devDependencies": {
     "@nuxt/devtools": "^1.0.8",
