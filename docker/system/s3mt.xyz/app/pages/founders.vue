@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useWallet, useAnchorWallet } from 'solana-wallets-vue'
-import useSignAndSendTransaction from '~/composables/useSignAndSendTransaction'
 import { Connection, PublicKey, SystemProgram, SYSVAR_CLOCK_PUBKEY, LAMPORTS_PER_SOL } from '@solana/web3.js'
 import { AnchorProvider, Program, BN } from '@coral-xyz/anchor'
 import { getAssociatedTokenAddress, TOKEN_PROGRAM_ID, getAccount } from '@solana/spl-token'
@@ -65,8 +64,7 @@ const formattedTokenPrice = computed(() => {
 const isValid = computed(() => amount.value > 0)
 
 // Wallet & UI state
-const { connected, publicKey, sendTransaction, signTransaction } = useWallet()
-
+const { connected, publicKey } = useWallet()
 const wallet = useAnchorWallet()
 
 const loading = ref(false)
@@ -83,13 +81,6 @@ const treasuryAddress = config.public.treasury
 
 // Solana connection
 const connection = new Connection(rpcUrl, { commitment: 'confirmed' })
-// Sign and send abstraction
-const { signAndSendTransaction } = useSignAndSendTransaction({
-  connection,
-  publicKey,
-  sendTransaction,
-  signTransaction
-})
 
 // Recent purchases for social proof (fetched from blockchain via composable)
 const { transactions, loading: historyLoading, errorMsg: historyError, fetchTransactionHistory, statsMetrics } = useTransactionHistory()
@@ -364,8 +355,8 @@ async function onPurchase() {
         new PublicKey(treasuryAddress)
       )
 
-      // Build and send USDC purchase transaction via wallet
-      const purchaseUsdcTx = await program.methods
+      // Call purchase_usdc
+      const txSigUsdc = await program.methods
         .purchaseUsdc(usdcAmountBn, s3mtAmountBn)
         .accounts({
           buyer: publicKey.value,
@@ -376,12 +367,8 @@ async function onPurchase() {
           tokenProgram: TOKEN_PROGRAM_ID,
           clock: SYSVAR_CLOCK_PUBKEY
         })
-        .transaction()
-      // Sign and send transaction
-      const usdcSig = await signAndSendTransaction(purchaseUsdcTx, {
-        preflightCommitment: 'confirmed'
-      })
-      transactionSignature.value = usdcSig
+        .rpc()
+      transactionSignature.value = txSigUsdc
     } else {
       // For SOL: calculate using SOL price instead of fixed USD conversion
       const solCost = totalCost.value;
@@ -389,8 +376,8 @@ async function onPurchase() {
         Math.round(solCost * LAMPORTS_PER_SOL)
       )
 
-      // Build and send SOL purchase transaction via wallet
-      const purchaseSolTx = await program.methods
+      // Call purchase_sol
+      const txSigSol = await program.methods
         .purchaseSol(lamportsBn, s3mtAmountBn)
         .accounts({
           buyer: publicKey.value,
@@ -399,12 +386,8 @@ async function onPurchase() {
           clock: SYSVAR_CLOCK_PUBKEY,
           systemProgram: SystemProgram.programId
         })
-        .transaction()
-      // Sign and send transaction
-      const solSig = await signAndSendTransaction(purchaseSolTx, {
-        preflightCommitment: 'confirmed'
-      })
-      transactionSignature.value = solSig
+        .rpc()
+      transactionSignature.value = txSigSol
     }
 
     success.value = true
