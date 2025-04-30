@@ -43,13 +43,13 @@ The S3MT protocol aims to democratize access to commodity markets by minting syn
 ## Architecture
 
 ```mermaid
-graph LR
-  A[User Wallet] -->|Interact| B[Frontend (Nuxt 3)]
-  B --> C[Solana RPC / Traefik]
-  C --> D[Presale Program (Anchor)]
-  C --> E[DAO Program (Anchor)]
-  D --> F[Yield Distributor]
-  E --> G[DAO Treasury]
+graph LR;
+  A[User Wallet] -->|Interact| B[Frontend / Nuxt 3];
+  B --> C[Solana RPC / Traefik];
+  C --> D[Presale Program / Anchor];
+  C --> E[DAO Program / Anchor];
+  D --> F[Yield Distributor];
+  E --> G[DAO Treasury];
 ```
 
 ## Documentation
