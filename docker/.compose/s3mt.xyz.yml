@@ -4,7 +4,7 @@ include:
   
 services:
   s3mt.xyz:
-    image: ghcr.io/s3mtfoundation/s3mt.xyz:${S3MT_XYZ_IMAGE_TAG:-latest}
+    image: ghcr.io/${ORGANIZATION}/s3mt.xyz:${S3MT_XYZ_IMAGE_TAG:-latest}
     container_name: s3mt.xyz
     depends_on:
       - traefik
