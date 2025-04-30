@@ -2,7 +2,7 @@ import { resolve } from 'path'
 
 export default defineNuxtConfig({
   modules: ['@nuxtjs/tailwindcss', '@vueuse/motion/nuxt'],
-
+  ssr: false,
   app: {
     head: {
       title: 'S3MT Token Presale',
