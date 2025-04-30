@@ -45,6 +45,11 @@ export default function useSignAndSendTransaction(options: {
     // @ts-ignore: recentBlockhash exists on Transaction
     transaction.recentBlockhash = blockhash
 
+    if (window.solana.signAndSendTransaction) {
+      const { signature } = await window.solana.signAndSendTransaction(transaction, connection, opts)
+      return signature
+    }
+
     // If wallet adapter provides sendTransaction, use it directly
     if (sendTransaction) {
       return await sendTransaction(transaction, connection, opts)
