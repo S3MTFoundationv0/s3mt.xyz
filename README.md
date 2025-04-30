@@ -101,6 +101,11 @@ Comprehensive project documentation and whitepapers are located in the `docs/` d
    ```bash
    make dev
    ```
+6. Preview production build (optional):  
+   ```bash
+   yarn preview
+   ```
+   For more information on deployment, see the [Nuxt deployment documentation](https://nuxt.com/docs/getting-started/deployment).
 
 ## Contributing
 
@@ -118,14 +123,3 @@ Refer to `CONTRIBUTING.md` (if available) or open issues to discuss ideas.
 This project is licensed under the MIT License.  
 See [LICENSE](LICENSE) for details.
 
-```bash
-npm run build
-```
-
-Locally preview production build:
-
-```bash
-npm run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
