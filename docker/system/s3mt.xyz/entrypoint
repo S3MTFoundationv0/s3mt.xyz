@@ -72,8 +72,8 @@ _main() {
   chown -R nobody:nobody /app/.nuxt
   chown -R nobody:nobody /app/.output
 
-  server -s nuxt -D
-
+  server -s nuxt -D &
+  
   #_configureHAProxy $IMAGE_VERSION $NUXT_NUM_PROCS
   _configureHAProxy $IMAGE_VERSION 1
 
