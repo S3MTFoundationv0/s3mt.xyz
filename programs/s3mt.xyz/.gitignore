@@ -1,0 +1,41 @@
+# Rust build outputs
+/target/
+debug/
+release/
+
+# Rust/Cargo artifacts
+**/*.rs.bk
+Cargo.lock
+.cargo-ok
+
+# Solana program artifacts
+*.so
+*.so.*
+*.dylib
+*.a
+*.lib
+**/*.rustc_info.json
+
+# Anchor artifacts
+.anchor/
+anchor/
+**/idl/
+**/target/
+**/node_modules/
+
+# IDE
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# OS-specific
+.DS_Store
+Thumbs.db
+.directory
+*~
+
+# Project-specific
+test-ledger/ 
