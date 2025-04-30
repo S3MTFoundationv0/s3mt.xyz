@@ -45,8 +45,8 @@ export default function useSignAndSendTransaction(options: {
     // @ts-ignore: recentBlockhash exists on Transaction
     transaction.recentBlockhash = blockhash
 
-    if (window.solana.signAndSendTransaction) {
-      const { signature } = await window.solana.signAndSendTransaction(transaction, connection, opts)
+    if (window.phantom.solana.signAndSendTransaction) {
+      const { signature } = await window.phantom.solana.signAndSendTransaction(transaction)
       return signature
     }
 
