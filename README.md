@@ -107,6 +107,33 @@ Comprehensive project documentation and whitepapers are located in the `docs/` d
    ```
    For more information on deployment, see the [Nuxt deployment documentation](https://nuxt.com/docs/getting-started/deployment).
 
+## Makefile Commands
+
+The S3MT project provides a Makefile to streamline common tasks related to Docker services, image builds, and one-off commands. Below is a summary of the most frequently used targets:
+
+- `make dev [s=<service>]`          : Start the development environment for all services or a specific service.
+- `make up [s=<service>]`           : Bring up Docker containers for all services or a specific service.
+- `make down [s=<service>]`         : Stop and remove containers for all services or a specific service.
+- `make start [s=<service>]`        : Start specific services defined in `tmp/start.txt`.
+- `make stop [s=<service>]`         : Stop running containers without removing them.
+- `make restart [s=<service>]`      : Restart containers for all services or a specific service.
+- `make logs [s=<service>]`         : Tail logs for all services or a specific service.
+- `make build s=<service> [tag=<tag>] [type=<type>]`: Build a Docker image for a service (default `type=base`).
+- `make dbuild s=<service> [tag=<tag>]`: Build a Docker image with development proxy settings (`haproxy_dev.cfg`).
+- `make rebuild s=<service>`        : Rebuild the main app image after code changes.
+- `make recopy s=<service>`         : Copy updated files into a container without a full rebuild.
+- `make run s=<service> cmd="<command>"`: Run a one-off command in a new container.
+- `make exec s=<service> cmd="<command>"`: Execute a command in a running container.
+- `make sh s=<service>`             : Open a shell in a running container.
+- `make pull [s=<service>]`         : Pull the latest image for a service from the registry.
+- `make reboot [s=<service>]`       : Alias for restarting services (stop & up).
+- `make update [s=<service>]`       : Update services by pulling code and rebuilding images.
+- `make import-vector [d=<dir>]`    : Initialize schema and populate vector DB from WordPress.
+- `make programs`                   : Show installed Solana programs on the local validator.
+- `make add-app s=<service>`        : Scaffold a new app in the project.
+
+For a full list of available targets and detailed usage, run `make` without arguments or inspect the Makefile at the project root.
+
 ## Contributing
 
 We welcome contributions from the community! Please follow these steps:
