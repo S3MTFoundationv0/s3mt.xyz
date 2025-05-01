@@ -5,7 +5,6 @@ include make/build.mk
 include make/dev.mk
 include make/down.mk
 include make/exec.mk
-include make/import-vector.mk
 include make/logs.mk
 include make/pull.mk
 include make/reboot.mk
