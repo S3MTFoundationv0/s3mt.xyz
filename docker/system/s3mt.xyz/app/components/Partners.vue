@@ -59,6 +59,20 @@ useIntersectionObserver(
            ]">
            <img src="/assets/images/s3mt-partners-xt-logo.png" alt="XT.com Logo" class="h-50 filter brightness-0 invert">
         </a>
+        <a href="https://luxor.tech?ref=s3mt.xyz" target="_blank" rel="noopener noreferrer" 
+           :class="[
+             'flex flex-col items-center justify-center p-6 bg-base-200/90 backdrop-blur-md border-2 border-neutral-focus rounded-xl hover:shadow-xl hover:shadow-primary/30 hover:scale-105 hover:border-primary transition-all duration-500 ease-out w-full max-w-sm',
+             isVisible ? 'opacity-100 translate-y-0 delay-300' : 'opacity-0 translate-y-5' 
+           ]">
+           <img src="/assets/images/sm3t-partners-luxor-logo.svg" alt="Luxor Logo" class="h-50 filter brightness-0 invert">
+        </a>
+        <a href="https://bitmain.com?ref=s3mt.xyz" target="_blank" rel="noopener noreferrer" 
+           :class="[
+             'flex flex-col items-center justify-center p-6 bg-base-200/90 backdrop-blur-md border-2 border-neutral-focus rounded-xl hover:shadow-xl hover:shadow-primary/30 hover:scale-105 hover:border-primary transition-all duration-500 ease-out w-full max-w-sm',
+             isVisible ? 'opacity-100 translate-y-0 delay-400' : 'opacity-0 translate-y-5' 
+           ]">
+           <img src="/assets/images/s3mt-partners-bitmain-logo.png" alt="Bitmain Logo" class="h-50 filter brightness-0 invert">
+        </a>
       </div>
     </div>
   </section>
