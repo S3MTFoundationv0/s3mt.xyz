@@ -1,6 +1,4 @@
-# S3MT – Synthetic Metals Token Protocol
-
-S3MT is an open-source decentralized protocol built on Solana that issues tokenized, synthetic representations of real-world metals. Token holders can participate in presales, earn on-chain yield, redeem tokens for value, and drive protocol direction through DAO governance.
+# S3MT 
 
 ## Table of Contents
 - [Project Overview](#project-overview)
@@ -15,7 +13,6 @@ S3MT is an open-source decentralized protocol built on Solana that issues tokeni
 
 ## Project Overview
 
-The S3MT protocol aims to democratize access to commodity markets by minting synthetic tokens that track the value of precious metals such as gold, silver, and platinum. Leveraging Solana’s high throughput and low fees, S3MT provides:
 
 - **Institutional-grade custody** via decentralized price oracles
 - **Presale mechanism** to bootstrap initial liquidity and community participation
