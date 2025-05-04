@@ -125,7 +125,6 @@ The S3MT project provides a Makefile to streamline common tasks related to Docke
 - `make pull [s=<service>]`         : Pull the latest image for a service from the registry.
 - `make reboot [s=<service>]`       : Alias for restarting services (stop & up).
 - `make update [s=<service>]`       : Update services by pulling code and rebuilding images.
-- `make import-vector [d=<dir>]`    : Initialize schema and populate vector DB from WordPress.
 - `make programs`                   : Show installed Solana programs on the local validator.
 - `make add-app s=<service>`        : Scaffold a new app in the project.
 
