@@ -33,7 +33,7 @@
           </div>
           <div class="team-content flex-1">
             <h3 class="text-2xl font-semibold mb-2 text-white">Blaine Francis</h3>
-            <p class="text-indigo-300 mb-4">Team Member</p>
+            <p class="text-indigo-300 mb-4">Marketing Manager</p>
             <p class="text-gray-300 text-sm mb-4 line-clamp-4 group-hover:line-clamp-none transition-all duration-300">
                 Originally from Fairhope, AL and a graduate of Spring Hill College (Mobile, AL) with a Bachelor's Degree in Business Administration with a concentration in Management and Marketing.  Have 5+ years of experience in digital marketing and social media management as well as 2+ years of experience in customer support across more than 10 different brands in both B2B and B2C markets. Currently working remotely based out of Birmingham, AL. 
             </p>
