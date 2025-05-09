@@ -162,8 +162,6 @@ export function useTransactionHistory() {
   }
 
   const startAutoRefresh = () => {
-    fetchTransactionHistory();
-    return;
     if (refreshIntervalId.value) return // Already running
     fetchTransactionHistory() // Fetch immediately on start
     refreshIntervalId.value = setInterval(fetchTransactionHistory, REFRESH_INTERVAL_MS)
