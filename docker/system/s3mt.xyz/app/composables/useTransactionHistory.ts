@@ -42,6 +42,8 @@ export function useTransactionHistory() {
 
   // Fetch and parse all presale transactions
   async function fetchTransactionHistory() {
+    if (loading.value) return;
+    console.log('fetchTransactionHistory')
     loading.value = true
     errorMsg.value = ''
     transactions.value = []
