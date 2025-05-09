@@ -12,6 +12,13 @@ useHead({
   meta: [{ name: 'description', content: 'Founders presale - get in early at $0.10 per unit.' }]
 })
 
+function debounce(func: () => void, wait: number) {
+  let timeout: NodeJS.Timeout;
+  return function(...args: any[]) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), wait);
+  };
+}
 
 // Price oracle data (would come from an actual oracle API in production)
 const solPrice = ref(169.42); // Current SOL price in USD
@@ -114,9 +121,10 @@ interface Transaction {
   currency: string;
 }
 
-onMounted(() => {
+onMounted(debounce(() => {
   fetchTransactionHistory()
-})
+}, 5000))
+
 const recentPurchases = computed(() =>
   transactions.value.slice(0, 5).map((tx: Transaction) => ({
     address: tx.buyer || '',
