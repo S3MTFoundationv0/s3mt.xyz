@@ -24,6 +24,9 @@ const { transactions, fetchTransactionHistory } = useTransactionHistory()
 // Reactive balances
 const tokenBalance = ref<number | null>(null)
 
+// State for popover
+const showFounderInfo = ref(false)
+
 // Fetch total token supply
 async function fetchTokenBalance() {
   if (!s3mtMint) {
@@ -68,6 +71,20 @@ const userPercentage = computed(() => {
 onMounted(() => {
   fetchTokenBalance()
   if (connected.value) fetchTransactionHistory()
+
+  // Close popover when clicking outside
+  document.addEventListener('click', (event) => {
+    const target = event.target as HTMLElement
+    const popover = document.querySelector('.founder-popover')
+    const infoButton = document.querySelector('.token-balance-box button[title="Founder Benefits Info"]')
+    
+    if (popover && 
+        !popover.contains(target) && 
+        infoButton && 
+        !infoButton.contains(target)) {
+      showFounderInfo.value = false
+    }
+  })
 })
 
 watch(connected, (isConnected: boolean) => {
@@ -116,9 +133,62 @@ watch(connected, (isConnected: boolean) => {
           <!-- Compact user balance for navbar -->
           <div v-if="connected">
             <div :class="[
-              'token-balance-box flex flex-col py-2 px-4 bg-indigo-950/90 backdrop-blur-sm rounded-lg border border-indigo-800/70 shadow-lg',
+              'token-balance-box relative flex flex-col py-2 px-4 bg-indigo-950/90 backdrop-blur-sm rounded-lg border border-indigo-800/70 shadow-lg',
               tokenGlowClass
             ]">
+              <!-- Popover trigger -->
+              <button 
+                @click="showFounderInfo = !showFounderInfo"
+                class="absolute top-0 right-0 -mt-1 -mr-1 text-purple-300 hover:text-purple-200"
+                title="Founder Benefits Info"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM8.94 6.94a.75.75 0 11-1.061-1.061 3 3 0 112.871 5.026v.345a.75.75 0 01-1.5 0v-.5c0-.72.57-1.172 1.081-1.287A1.5 1.5 0 108.94 6.94zM10 15a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                </svg>
+              </button>
+              
+              <!-- Founder benefits popover -->
+              <div v-if="showFounderInfo" class="founder-popover absolute right-0 top-full mt-2 bg-indigo-900/95 backdrop-blur-sm p-3 rounded-lg border border-indigo-700 shadow-xl z-50 w-64 animate-fade-in">
+                <div class="flex justify-between items-start">
+                  <h4 class="text-purple-300 font-medium text-sm">Founder Benefits</h4>
+                  <button @click="showFounderInfo = false" class="text-gray-400 hover:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
+                      <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+                    </svg>
+                  </button>
+                </div>
+                <div class="mt-2">
+                  <p class="text-white text-xs mb-2">
+                    Reach the <span class="text-green-400 font-medium">{{ tokenGoal }}</span> token goal to unlock:
+                  </p>
+                  <ul class="text-xs space-y-1.5">
+                    <li class="flex items-start">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3.5 h-3.5 text-purple-400 mt-0.5 mr-1">
+                        <path fill-rule="evenodd" d="M16.403 12.652a3 3 0 000-5.304 3 3 0 00-3.75-3.751 3 3 0 00-5.305 0 3 3 0 00-3.751 3.75 3 3 0 000 5.305 3 3 0 003.75 3.751 3 3 0 005.305 0 3 3 0 003.751-3.75zm-2.546-4.46a.75.75 0 00-1.214-.883l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                      </svg>
+                      <span class="text-gray-200">Become an official <span class="text-purple-300 font-medium">S3MT Founder</span></span>
+                    </li>
+                    <li class="flex items-start">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3.5 h-3.5 text-purple-400 mt-0.5 mr-1">
+                        <path fill-rule="evenodd" d="M16.403 12.652a3 3 0 000-5.304 3 3 0 00-3.75-3.751 3 3 0 00-5.305 0 3 3 0 00-3.751 3.75 3 3 0 000 5.305 3 3 0 003.75 3.751 3 3 0 005.305 0 3 3 0 003.751-3.75zm-2.546-4.46a.75.75 0 00-1.214-.883l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                      </svg>
+                      <span class="text-gray-200">Receive a limited edition <span class="text-blue-300 font-medium">Founder's NFT</span></span>
+                    </li>
+                    <li class="flex items-start">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3.5 h-3.5 text-purple-400 mt-0.5 mr-1">
+                        <path fill-rule="evenodd" d="M16.403 12.652a3 3 0 000-5.304 3 3 0 00-3.75-3.751 3 3 0 00-5.305 0 3 3 0 00-3.751 3.75 3 3 0 000 5.305 3 3 0 003.75 3.751 3 3 0 005.305 0 3 3 0 003.751-3.75zm-2.546-4.46a.75.75 0 00-1.214-.883l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                      </svg>
+                      <span class="text-gray-200">Unlock <span class="text-green-300 font-medium">exclusive benefits</span> & early platform access</span>
+                    </li>
+                  </ul>
+                  <div class="mt-3 pt-2 border-t border-indigo-700">
+                    <a href="/founders" class="inline-block text-xs text-purple-300 hover:text-purple-200 font-medium">
+                      Learn more about Founder Benefits →
+                    </a>
+                  </div>
+                </div>
+              </div>
+              
               <!-- Label and amount on top -->
               <div class="flex justify-between items-center mb-1">
                 <span class="text-white leading-none">{{ userPurchasedAmount }}</span>
@@ -207,5 +277,14 @@ watch(connected, (isConnected: boolean) => {
 
 .animate-pulse-fast {
   animation: pulse-fast 1.5s infinite;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 </style>
