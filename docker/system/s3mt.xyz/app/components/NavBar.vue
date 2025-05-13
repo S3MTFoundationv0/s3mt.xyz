@@ -36,7 +36,7 @@ async function fetchTokenBalance() {
   }
   try {
     const { value } = await connection.getTokenSupply(new PublicKey(s3mtMint))
-    tokenBalance.value = 5000 ///value.uiAmount ?? 0
+    tokenBalance.value = value.uiAmount ?? 0
   } catch (e) {
     console.error('Error fetching total token supply', e)
     tokenBalance.value = null
