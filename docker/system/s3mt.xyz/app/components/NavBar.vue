@@ -24,7 +24,7 @@ const { transactions, fetchTransactionHistory } = useTransactionHistory()
 // Reactive balances
 const tokenBalance = ref<number | null>(null)
 
-// State for popover
+// State for popovers (moved to the top for visibility)
 const showFounderInfo = ref(false)
 const showFounderInfoMobile = ref(false)
 
@@ -68,6 +68,12 @@ const userPercentage = computed(() => {
   return Math.min(Math.max(perc, 0), 100)
 })
 
+// Add console logging to help with debugging
+function toggleMobileInfo() {
+  showFounderInfoMobile.value = !showFounderInfoMobile.value
+  console.log('Mobile info toggled:', showFounderInfoMobile.value)
+}
+
 // Lifecycle hooks
 onMounted(() => {
   fetchTokenBalance()
@@ -88,15 +94,7 @@ onMounted(() => {
       showFounderInfo.value = false
     }
     
-    // Mobile popover
-    const mobileInfoButton = document.querySelector('button[title="Founder Benefits Info"]')
-    if (!event.composedPath().some(el => {
-      return el instanceof HTMLElement && 
-             (el.classList?.contains('bg-indigo-900/95') || 
-              el === mobileInfoButton)
-    })) {
-      showFounderInfoMobile.value = false
-    }
+    // The mobile popover click-outside handling is simpler - we'll use stopPropagation instead
   })
 })
 
@@ -282,7 +280,7 @@ watch(connected, (isConnected: boolean) => {
             
             <!-- Info button -->
             <button 
-              @click="showFounderInfoMobile = !showFounderInfoMobile" 
+              @click.stop="toggleMobileInfo" 
               class="text-purple-300 hover:text-purple-200 bg-indigo-900/60 p-1.5 rounded-full hover:bg-indigo-800/60 flex-shrink-0"
               title="Founder Benefits Info"
             >
@@ -295,10 +293,10 @@ watch(connected, (isConnected: boolean) => {
       </div>
 
       <!-- Mobile founder benefits popover (full width) -->
-      <div v-if="showFounderInfoMobile" class="w-full bg-indigo-900/95 backdrop-blur-sm p-4 border-b border-indigo-700 shadow-lg animate-fade-in">
+      <div v-if="showFounderInfoMobile" class="w-full bg-indigo-900/95 backdrop-blur-sm p-4 border-b border-indigo-700 shadow-lg animate-fade-in z-50">
         <div class="flex justify-between items-start mb-2">
           <h4 class="text-purple-300 font-semibold text-base">Founder Benefits</h4>
-          <button @click="showFounderInfoMobile = false" class="text-gray-400 hover:text-white p-1">
+          <button @click.stop="showFounderInfoMobile = false" class="text-gray-400 hover:text-white p-1">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
               <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
             </svg>
