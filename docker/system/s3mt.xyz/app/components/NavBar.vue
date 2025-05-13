@@ -1,3 +1,83 @@
+<script setup lang="ts">
+import { ref, computed, onMounted, watch } from 'vue'
+import { useWallet } from 'solana-wallets-vue'
+import { Connection, PublicKey } from '@solana/web3.js'
+import { useRuntimeConfig } from '#app'
+import ThemedProgressBar from '~/components/ui/ThemedProgressBar.vue'
+import { useTransactionHistory, type ParsedTransaction } from '~/composables/useTransactionHistory'
+
+// Initialize Solana Wallets Vue
+useSWV()
+
+// Runtime config
+const config = useRuntimeConfig()
+const s3mtMint = config.public.s3mtMint
+const tokenGoal = config.public.tokenGoal
+
+// Wallet connection and RPC
+const { publicKey, connected } = useWallet()
+const connection = new Connection(config.public.solanaNetwork)
+
+// Initialize transaction history
+const { transactions, fetchTransactionHistory } = useTransactionHistory()
+
+// Reactive balances
+const tokenBalance = ref<number | null>(null)
+
+// Fetch total token supply
+async function fetchTokenBalance() {
+  if (!s3mtMint) {
+    tokenBalance.value = null
+    return
+  }
+  try {
+    const { value } = await connection.getTokenSupply(new PublicKey(s3mtMint))
+    tokenBalance.value = 5000 ///value.uiAmount ?? 0
+  } catch (e) {
+    console.error('Error fetching total token supply', e)
+    tokenBalance.value = null
+  }
+}
+
+// Compute user's presale purchases
+const userPurchasedAmount = computed(() => {
+  if (!publicKey.value) {
+    return 0
+  }
+  return transactions.value.reduce((sum, tx: ParsedTransaction) => {
+    return tx.buyer === publicKey.value.toBase58() ? sum + (Number(tx.s3mtAmount) || 0) : sum
+  }, 0)
+})
+
+// Determine glow color and intensity based on amount
+const tokenGlowClass = computed(() => {
+  const amount = userPurchasedAmount.value;
+  if (amount >= tokenGoal) return 'glow-gold animate-pulse-fast'; 
+  if (amount >= tokenGoal * 0.5) return 'glow-green animate-pulse-medium';
+  if (amount >= tokenGoal * 0.25) return 'glow-purple animate-pulse-slow';
+  return 'glow-blue';
+});
+
+// Compute user percentage
+const userPercentage = computed(() => {
+  const perc = (userPurchasedAmount.value / tokenGoal) * 100
+  return Math.min(Math.max(perc, 0), 100)
+})
+
+// Lifecycle hooks
+onMounted(() => {
+  fetchTokenBalance()
+  if (connected.value) fetchTransactionHistory()
+})
+
+watch(connected, (isConnected: boolean) => {
+  if (isConnected) fetchTransactionHistory()
+  else {
+    transactions.value = []
+  }
+})
+</script>
+
 <template>
   <nav class="sticky top-0 z-50 bg-indigo-900 border-b border-indigo-700 bg-opacity-75 backdrop-blur-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -7,6 +87,7 @@
             <img class="h-10 w-auto" src="/logo.svg" alt="S3MT Icon" />
             <Logo size="sm" />
           </NuxtLink>
+
           <div class="hidden md:block">
             <div class="ml-10 flex items-baseline space-x-4">
               <NuxtLink to="/" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Home</NuxtLink>
@@ -26,16 +107,105 @@
             </div>
           </div>
         </div>
-        <div class="flex items-center space-x-4">
-          <div v-if="s3mtMint" class="flex items-center space-x-2">
-            <div :class="['w-32', hasReachedGoal ? 'ring-2 ring-offset-1 ring-green-400 animate-pulse' : '']">
-              <ThemedProgressBar :value="percentage" />
-            </div>
-            <span class="text-gray-200 text-sm">{{ tokenBalance.toFixed(2) }} / {{ tokenGoal }}</span>
+        <div class="flex items-center space-x-3">
+          <!-- Token amount display (always visible) -->
+          <div v-if="tokenBalance !== null && !connected" class="token-display py-1 px-2.5 bg-indigo-950/90 rounded-md border border-indigo-800/70">
+            <span class="text-white font-medium text-base">{{ tokenBalance.toFixed(1) }}</span>
           </div>
+        
+          <!-- Compact user balance for navbar -->
+          <div v-if="connected">
+            <div :class="[
+              'token-balance-box flex flex-col py-2 px-4 bg-indigo-950/90 backdrop-blur-sm rounded-lg border border-indigo-800/70 shadow-lg',
+              tokenGlowClass
+            ]">
+              <!-- Label and amount on top -->
+              <div class="flex justify-between items-center mb-1">
+                <span class="text-white leading-none">{{ userPurchasedAmount }}</span>
+                / {{ tokenGoal }}
+              </div>
+              
+              <!-- Progress bar and refresh on bottom -->
+              <div class="flex items-center gap-2">
+                <div class="flex-grow h-1.5 bg-gray-800/50 rounded-full overflow-hidden">
+                  <ThemedProgressBar 
+                    :value="userPercentage" 
+                    size="xs" 
+                    :variant="userPurchasedAmount >= tokenGoal ? 'success' : 'info'"
+                  />
+                </div>
+                
+                <button 
+                  @click="fetchTransactionHistory" 
+                  class="text-gray-400 hover:text-white p-0.5 rounded-full hover:bg-indigo-800/30 flex-shrink-0"
+                  title="Refresh your balance"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+          
           <WalletConnect />
         </div>
       </div>
     </div>
   </nav>
 </template>
+
+<style scoped>
+.token-balance-box {
+  min-width: 160px;
+  max-width: 200px;
+  transition: all 0.3s ease;
+}
+
+.text-2xs {
+  font-size: 0.65rem;
+}
+
+.glow-blue {
+  box-shadow: 0 0 5px 0 rgba(79, 140, 255, 0.2);
+}
+
+.glow-purple {
+  box-shadow: 0 0 8px 0 rgba(139, 92, 246, 0.3);
+}
+
+.glow-green {
+  box-shadow: 0 0 12px 0 rgba(16, 185, 129, 0.4);
+}
+
+.glow-gold {
+  box-shadow: 0 0 15px 0 rgba(251, 191, 36, 0.5);
+}
+
+@keyframes pulse-slow {
+  0%, 100% { opacity: 1; box-shadow: 0 0 8px 0 rgba(139, 92, 246, 0.3); }
+  50% { opacity: 0.95; box-shadow: 0 0 12px 2px rgba(139, 92, 246, 0.5); }
+}
+
+@keyframes pulse-medium {
+  0%, 100% { opacity: 1; box-shadow: 0 0 12px 0 rgba(16, 185, 129, 0.4); }
+  50% { opacity: 0.95; box-shadow: 0 0 15px 3px rgba(16, 185, 129, 0.6); }
+}
+
+@keyframes pulse-fast {
+  0%, 100% { opacity: 1; box-shadow: 0 0 15px 0 rgba(251, 191, 36, 0.5); }
+  50% { opacity: 0.95; box-shadow: 0 0 20px 5px rgba(251, 191, 36, 0.8); }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 3s infinite;
+}
+
+.animate-pulse-medium {
+  animation: pulse-medium 2s infinite;
+}
+
+.animate-pulse-fast {
+  animation: pulse-fast 1.5s infinite;
+}
+</style>
